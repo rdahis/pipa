@@ -1,3 +1,5 @@
 scrapy
 service_identity
 beautifulsoup4
+psycopg2
+ipdb
