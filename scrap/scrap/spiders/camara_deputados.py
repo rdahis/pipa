@@ -24,6 +24,7 @@ def _create_item_from_element(element):
     d = items.DeputadoFederal()
     d['id_cadastro'] = element.find('ideCadastro')
     d['id_deputado_federal'] = element.find('idParlamentar').text
+    d['id_orcamento'] = element.find('codOrcamento').text
     d['nome'] = element.find('nome').text
     d['nome_parlamentar'] = element.find('nomeParlamentar').text
     d['sexo'] = element.find('sexo').text

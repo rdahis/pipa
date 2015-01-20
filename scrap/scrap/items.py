@@ -24,6 +24,7 @@ class ProjetoDeLei(scrapy.Item):
 class DeputadoFederal(scrapy.Item):
     id_cadastro = Field()
     id_deputado_federal = Field()
+    id_orcamento = Field()
     nome = Field()
     nome_parlamentar = Field()
     sexo = Field()
