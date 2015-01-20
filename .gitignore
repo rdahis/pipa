@@ -1,5 +1,4 @@
 *.swp
 *.pyc
 *.pyo
-
-/tmp
+tmp
