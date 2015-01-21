@@ -13,5 +13,13 @@ BOT_NAME = 'scrap'
 SPIDER_MODULES = ['scrap.spiders']
 NEWSPIDER_MODULE = 'scrap.spiders'
 
+DATABASE = {
+	'drivername': 'postgres',
+	'host': 'localhost',
+	'port': '5432',
+	'username': 'vagrant',
+	'password': '.',
+	'database': 'DP'
+}
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scrap (+http://www.yourdomain.com)'
