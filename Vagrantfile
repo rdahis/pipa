@@ -71,7 +71,8 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
   ##TODO: botar locale no puppet
   #config.vm.provision "shell", inline: 'cp /vagrant/manifests/lang.sh /etc/profile.d/lang.sh'
-  #config.vm.provision "shell", inline: 'cp /vagrant/manifests/locale /etc/default/locale'
+  config.vm.provision "shell", inline: 'cp /vagrant/manifests/locale /etc/default/locale'
+  config.vm.provision "file", source:  '~/.gitconfig', destination: '/home/vagrant/.gitconfig'
   config.vm.provision "shell", inline: 'touch /etc/puppet/hiera.yaml'
   config.vm.provision "puppet" do |puppet|
 		puppet.module_path = "manifests/modules"
