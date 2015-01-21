@@ -1,0 +1,9 @@
+[submodule "manifests/modules/postgresql"]
+	path = manifests/modules/postgresql
+	url = https://github.com/puppetlabs/puppetlabs-postgresql.git
+[submodule "manifests/modules/apt"]
+	path = manifests/modules/apt
+	url = https://github.com/puppetlabs/puppetlabs-apt.git
+[submodule "manifests/modules/concat"]
+	path = manifests/modules/concat
+	url = https://github.com/puppetlabs/puppetlabs-concat.git
