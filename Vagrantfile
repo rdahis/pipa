@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 5432, host: 5432
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -69,7 +69,9 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  #config.vm.provision "shell", inline: 'apt-get -y install puppet'
+  ##TODO: botar locale no puppet
+  #config.vm.provision "shell", inline: 'cp /vagrant/manifests/lang.sh /etc/profile.d/lang.sh'
+  #config.vm.provision "shell", inline: 'cp /vagrant/manifests/locale /etc/default/locale'
   config.vm.provision "shell", inline: 'touch /etc/puppet/hiera.yaml'
   config.vm.provision "puppet" do |puppet|
 		puppet.module_path = "manifests/modules"
