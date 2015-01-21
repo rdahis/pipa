@@ -16,14 +16,21 @@ class LideresBancadasSpider(scrapy.Spider):
 
     def parse(self, response):
         tree = ET.fromstring(response.body)
-        import ipdb; ipdb.set_trace()
-        for pessoa in tree.getchildren():
-            i = _create_item_from_element(pessoa)
-            yield i
+        for bancada in tree.getchildren():
+            for posicao in bancada.getchildren():
+                i = _create_item_from_element(posicao, bancada)
+                yield i
 
-def _create_item_from_element(element):
+def _create_item_from_element(posicao, bancada):
     out = items.LiderBancada()
-    out['nome'] = element.find('nome')
-    out['id_cadastro'] = element.find('ideCadastro')
-    out['partido'] = element.find('partido')
-    out['uf'] = element.find('uf')
+    out['nome'] = posicao.find('nome').text
+    out['id_cadastro'] = posicao.find('ideCadastro').text
+    out['partido'] = posicao.find('partido').text
+    out['uf'] = posicao.find('uf').text
+    if posicao.tag == 'lider':
+        out['posicao'] = 'Lider'
+    elif posicao.tag == 'vice_lider':
+        out['posicao'] = 'Vice-Lider'
+    out['bancada'] = bancada.attrib['sigla']
+    out['bancada_nome'] = bancada.attrib['nome']
+    return out

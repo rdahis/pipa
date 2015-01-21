@@ -2,6 +2,9 @@
 import scrapy
 import scrap.items as items
 
+# html
+import urllib
+
 # XML Parser
 import elementtree.ElementTree as ET
 from elementtree.ElementTree import Element, SubElement
@@ -9,31 +12,49 @@ from elementtree.ElementTree import Element, SubElement
 
 class CamaraDeputadosSpider(scrapy.Spider):
     name = "camara_deputados"
-    allowed_domains = ["www2.camara.leg.br/"]
+    allowed_domains = ["www.camara.gov.br"]
     start_urls = (
         'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDeputados',
     )
 
     def parse(self, response):
-        tree = ET.fromstring(response.body)
-        for deputado in tree.getchildren():
-            d = _create_item_from_element(deputado)
-            yield d
+        basic_list = ET.fromstring(response.body)
+        for deputado in basic_list.getchildren():
+            id_cadastro = deputado.find('ideCadastro').text
+            params = urllib.urlencode({'ideCadastro': id_cadastro, 'numLegislatura': ''})
+            url = 'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDetalhesDeputado'
+            yield scrapy.http.Request(url + '?' + params, callback=self.parse2(r, deputado))
 
-def _create_item_from_element(element):
-    d = items.DeputadoCamara()
-    d['id_cadastro'] = element.find('ideCadastro')
-    d['id_deputado_federal'] = element.find('idParlamentar').text
-    d['id_orcamento'] = element.find('codOrcamento').text
-    d['nome'] = element.find('nome').text
-    d['nome_parlamentar'] = element.find('nomeParlamentar').text
-    d['sexo'] = element.find('sexo').text
-    d['partido'] = element.find('partido').text
-    d['uf'] = element.find('uf').text
-    d['condicao'] = element.find('condicao').text
-    d['matricula'] = element.find('matricula').text
-    d['gabinete'] = element.find('gabinete').text
-    d['anexo'] = element.find('anexo').text
-    d['telefone'] = element.find('fone').text
-    d['url_foto'] = element.find('urlFoto').text
+    def parse2(self,r, deputado):
+        deputado_detalhes = ET.fromstring(r.body).find('./Deputado')
+        dep = _create_item_from_element(deputado, deputado_detalhes)
+        yield dep
+
+def _create_item_from_element(element, element_detalhes):
+    out = items.DeputadoCamara()
+    out['id_cadastro'] = element.find('ideCadastro').text
+    out['id_deputado_federal'] = element.find('idParlamentar').text
+    out['id_orcamento'] = element.find('codOrcamento').text
+    out['condicao'] = element.find('condicao').text
+    out['matricula'] = element.find('matricula').text
+    #out['uf'] = element.find('uf').text
+    out['telefone'] = element.find('fone').text
+    out['url_foto'] = element.find('urlFoto').text
+    out['legislatura'] = element_detalhes.find('numLegislatura').text
+    out['email'] = element_detalhes.find('email').text
+    out['profissao'] = element_detalhes.find('nomeProfissao').text
+    out['data_nascimento'] = element_detalhes.find('dataNascimento').text
+    out['data_falecimento'] = element_detalhes.find('dataFalecimento').text
+    out['uf_representacao'] = element_detalhes.find('ufRepresentacaoAtual').text
+    out['situacao'] = element_detalhes.find('situacaoNaLegislaturaAtual').text
+    out['id_deputado_federal_deprecated'] = element_detalhes.find('idParlamentarDeprecated').text
+    out['nome_parlamentar'] = element_detalhes.find('nomeParlamentarAtual').text
+    out['nome'] = element_detalhes.find('nomeCivil').text
+    out['sexo'] = element_detalhes.find('sexo').text
+    out['partido_sigla'] = element_detalhes.find('./partidoAtual/idPartido').text
+    out['partido'] = element_detalhes.find('./partidoAtual/sigla').text
+    out['partido_nome'] = element_detalhes.find('./partidoAtual/nome').text
+    out['gabinete_numero'] = element_detalhes.find('gabinete/numero').text
+    out['gabinete_anexo'] = element_detalhes.find('gabinete/anexo').text
+    return out
 
