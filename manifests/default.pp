@@ -1,6 +1,4 @@
 include apt
-include postgresql::server
-include postgresql::globals
 
 #apt::key { 'postgresql':
 #	key        => 'ACCC4CF8',
@@ -17,11 +15,6 @@ class { 'postgresql::globals':
 	version             => '9.4',
 }->
 class { 'postgresql::server': }
-
-postgresql::server::db { 'mydatabasename':
-	user     => 'mydatabaseuser',
-	password => postgresql_password('mydatabaseuser', 'mypassword'),
-}
 
 package {
 	"git":
