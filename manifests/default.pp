@@ -1,22 +1,19 @@
 include apt
 
-#apt::key { 'postgresql':
-#	key        => 'ACCC4CF8',
-#	key_source => 'https://www.postgresql.org/media/keys/ACCC4CF8.asc',
-#}
-#apt::source { "postgresql":
-#	location        => "http://apt.postgresql.org/pub/repos/apt/",
-#	release         => "${::lsbdistcodename}-pgdg",
-#	repos           => "main",
-#}
-
 class { 'postgresql::globals':
 	manage_package_repo => true,
 	version             => '9.4',
 }->
-class { 'postgresql::server': }
+class { 'postgresql::server':
+}
+postgresql::server::db { 'DP':
+	user => 'vagrant',
+	password => ''
+}
 
 package {
-	"git":
-		ensure => present
+	'git':
+	ensure => latest
+	;'bash-completion':
+	ensure => present
 }
