@@ -21,7 +21,7 @@ class CamaraDeputadosSpider(scrapy.Spider):
             yield d
 
 def _create_item_from_element(element):
-    d = items.DeputadoFederal()
+    d = items.DeputadoCamara()
     d['id_cadastro'] = element.find('ideCadastro')
     d['id_deputado_federal'] = element.find('idParlamentar').text
     d['id_orcamento'] = element.find('codOrcamento').text
