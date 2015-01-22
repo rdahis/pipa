@@ -22,6 +22,9 @@ DATABASE = {
 	'database': 'DP'
 }
 
+ITEM_PIPELINES = {
+        'scrap.pipelines.ScrapPipeline': 300
+}
 DOWNLOADER_MIDDLEWARES = {
 	'scrapy.contrib.downloadermiddleware.httpcache.HttpCacheMiddleware' : 500
 }
