@@ -16,7 +16,7 @@ class CamaraOrgaosCargosSpider(scrapy.Spider):
 
     def parse(self, response):
         tree = ET.fromstring(response.body)
-        for cargo in tree.find('./cargo'):
+        for cargo in tree.getchildren():
             i = _create_item_from_element(cargo)
             yield i
 
