@@ -1,5 +1,6 @@
 include apt
 $PROJECT_ROOT = '/DP'
+$BACKPORTS = '/wheezy-backports'
 
 apt::source { 'debian_backports':
 	location          => 'http://http.debian.net/debian',
@@ -26,7 +27,7 @@ postgresql::server::db { 'DP':
 
 
 package {
-	'git':
+	"git${BACKPORTS}":
 		ensure => latest
 	;'python2.7':
 		ensure => present

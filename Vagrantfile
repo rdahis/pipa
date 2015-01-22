@@ -1,6 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+if !Vagrant.has_plugin?("vagrant-timezone")
+	puts "There is a vagrant plugin missing, will attempt installation."
+	system('vagrant plugin install vagrant-timezone')
+end
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -61,6 +66,8 @@ Vagrant.configure(2) do |config|
   # View the documentation for the provider you are using for more
   # information on available options.
 
+  config.timezone.value = "America/Sao_Paulo"
+
   # Define a Vagrant Push strategy for pushing to Atlas. Other push strategies
   # such as FTP and Heroku are also available. See the documentation at
   # https://docs.vagrantup.com/v2/push/atlas.html for more information.
@@ -73,7 +80,8 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
   ##TODO: botar locale no puppet
   #config.vm.provision "shell", inline: 'cp /vagrant/manifests/lang.sh /etc/profile.d/lang.sh'
-  config.vm.provision "shell", inline: 'cp /vagrant/manifests/locale /etc/default/locale'
+  config.vm.provision "shell", inline: 'cp /DP/manifests/locale /etc/default/locale'
+  config.vm.provision "shell", inline: 'echo  /etc/default/locale'
   config.vm.provision "file", source:  '~/.gitconfig', destination: '/home/vagrant/.gitconfig'
   config.vm.provision "shell", inline: 'touch /etc/puppet/hiera.yaml'
   config.vm.provision "puppet" do |puppet|
