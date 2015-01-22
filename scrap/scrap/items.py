@@ -67,6 +67,42 @@ class OrgaoCamara(scrapy.Item):
     id_orgao = Field()
     descricao = Field()
 
+class ProposicaoCamara(scrapy.Item):
+    id_proposicao = Field()
+    nome_proposicao = Field()
+    id_tipo_proposicao = Field()
+    sigla_tipo_proposicao = Field()
+    nome_tipo_proposicao = Field()
+    numero_proposicao = Field()
+    ano = Field()
+    id_orgao_numerador = Field()
+    sigla_orgao_numerador = Field()
+    nome_orgao_numerador = Field()
+    data_apresentacao = Field()
+    texto_ementa = Field()
+    texto_ementa_explicacao = Field()
+    id_regime = Field()
+    texto_regime = Field()
+    id_apreciacao = Field()
+    texto_apreciacao = Field()
+    nome_autor = Field()
+    id_cadastro = Field()
+    id_partido = Field()
+    partido_sigla = Field()
+    uf = Field()
+    qtde_autores = Field()
+    data_despacho = Field()
+    texto_despacho = Field()
+    id_situacao = Field()
+    descricao_situacao = Field()
+    id_orgao = Field()
+    sigla_orgao = Field()
+    id_proposicao_principal = Field()
+    proposicao_principal = Field()
+    ind_genero = Field()
+    qtde_orgaos = Field()
+
+
 #---------------------------------------#
 # Camara de Vereadores - Rio de Janeiro
 #---------------------------------------#

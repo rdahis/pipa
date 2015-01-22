@@ -23,9 +23,10 @@ class CamaraDeputadosSpider(scrapy.Spider):
             id_cadastro = deputado.find('ideCadastro').text
             params = urllib.urlencode({'ideCadastro': id_cadastro, 'numLegislatura': ''})
             url = 'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDetalhesDeputado'
-            yield scrapy.http.Request(url + '?' + params, callback=self.parse2(r, deputado))
+            yield scrapy.http.Request(url + '?' + params, callback=self.parse2, meta={'deputado': deputado})
 
-    def parse2(self,r, deputado):
+    def parse2(self,r):
+        deputado = r.meta['deputado']
         deputado_detalhes = ET.fromstring(r.body).find('./Deputado')
         dep = _create_item_from_element(deputado, deputado_detalhes)
         yield dep
