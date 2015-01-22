@@ -1,4 +1,5 @@
 include apt
+$PROJECT_ROOT = '/DP'
 
 apt::source { 'debian_backports':
 	location          => 'http://http.debian.net/debian',
@@ -47,5 +48,5 @@ package {
 		ensure => present
 }
 ->
-python::requirements { '/vagrant/scrap/requirements.txt' :
+python::requirements { "${PROJECT_ROOT}/scrap/requirements.txt" :
 }

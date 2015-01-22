@@ -21,5 +21,13 @@ DATABASE = {
 	'password': '.',
 	'database': 'DP'
 }
+
+DOWNLOADER_MIDDLEWARES = {
+	'scrapy.contrib.downloadermiddleware.httpcache.HttpCacheMiddleware' : 500
+}
+HTTPCACHE_ENABLED = True
+HTTPCACHE_DIR='/tmp/httpcache'
+#HTTPCACHE_STORAGE = 'scrapy.contrib.httpcache.DbmCacheStorage'
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scrap (+http://www.yourdomain.com)'
