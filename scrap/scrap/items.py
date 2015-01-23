@@ -102,6 +102,22 @@ class ProposicaoCamara(scrapy.Item):
     ind_genero = Field()
     qtde_orgaos = Field()
 
+class PresencaSessaoDeputadoCamara(scrapy.Item):
+    matricula = Field()
+    nome_parlamentar_cheio = Field()
+    partido_sigla = Field()
+    uf = Field()
+    frequencia = Field()
+    justificativa = Field()
+    presenca_externa = Field()
+    inicio_sessao = Field()
+    descricao_sessao = Field()
+    frequencia_sessao = Field()
+
+
+
+
+
 
 #---------------------------------------#
 # Camara de Vereadores - Rio de Janeiro

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import scrap.items as items
+from scrapy.http import HtmlResponse
 
 # html
 import urllib
 
 # XML Parser
-import elementtree.ElementTree as ET
-from elementtree.ElementTree import Element, SubElement
+from lxml.etree import fromstring
 
 
 class CamaraProposicoesSpider(scrapy.Spider):
@@ -18,7 +18,7 @@ class CamaraProposicoesSpider(scrapy.Spider):
     )
 
     def parse(self, response):
-        basic_list = ET.fromstring(response.body)
+        basic_list = fromstring(response.body)
         for deputado in basic_list.getchildren():
             nome_parlamentar = deputado.find('nomeParlamentar').text
             nome_parlamentar_enc = nome_parlamentar.encode('utf-8')
@@ -41,18 +41,17 @@ class CamaraProposicoesSpider(scrapy.Spider):
             yield scrapy.http.Request(url, callback=self.parse2)
     
     def parse2(self,r):
-        for proposicao in ET.fromstring(r.body).getchildren():
-            #proposicao = ET.fromstring(r.body).find('./proposicao')
+        for proposicao in fromstring(r.body).getchildren():
             prop = _create_item_from_element(proposicao)
             yield prop
 
 def _create_item_from_element(element):
     out = items.ProposicaoCamara()
     out['id_proposicao'] = element.find('id').text
-    out['nome_proposicao'] = element.find('nome').text    
-    out['id_tipo_proposicao'] = element.find('tipoProposicao/id').text    
-    out['sigla_tipo_proposicao'] = element.find('tipoProposicao/sigla').text    
-    out['nome_tipo_proposicao'] = element.find('tipoProposicao/nome').text    
+    out['nome_proposicao'] = element.find('nome').text
+    out['id_tipo_proposicao'] = element.find('tipoProposicao/id').text
+    out['sigla_tipo_proposicao'] = element.find('tipoProposicao/sigla').text
+    out['nome_tipo_proposicao'] = element.find('tipoProposicao/nome').text
     out['numero_proposicao'] = element.find('numero').text
     out['ano'] = element.find('ano').text
     out['id_orgao_numerador'] = element.find('orgaoNumerador/id').text

@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import scrap.items as items
+from scrapy.http import HtmlResponse
 
 # XML Parser
-import elementtree.ElementTree as ET
-from elementtree.ElementTree import Element, SubElement
-
+from lxml.etree import fromstring
 
 class CamaraOrgaosCargosSpider(scrapy.Spider):
     name = "camara_orgaos_cargos"
@@ -15,7 +14,7 @@ class CamaraOrgaosCargosSpider(scrapy.Spider):
     )
 
     def parse(self, response):
-        tree = ET.fromstring(response.body)
+        tree = fromstring(response.body)
         for cargo in tree.getchildren():
             i = _create_item_from_element(cargo)
             yield i

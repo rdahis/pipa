@@ -6,8 +6,7 @@ import scrap.items as items
 import urllib
 
 # XML Parser
-import elementtree.ElementTree as ET
-from elementtree.ElementTree import Element, SubElement
+from lxml.etree import fromstring
 
 
 class CamaraDeputadosSpider(scrapy.Spider):
@@ -18,7 +17,7 @@ class CamaraDeputadosSpider(scrapy.Spider):
     )
 
     def parse(self, response):
-        basic_list = ET.fromstring(response.body)
+        basic_list = fromstring(response.body)
         for deputado in basic_list.getchildren():
             id_cadastro = deputado.find('ideCadastro').text
             params = urllib.urlencode({'ideCadastro': id_cadastro, 'numLegislatura': ''})
@@ -27,7 +26,7 @@ class CamaraDeputadosSpider(scrapy.Spider):
 
     def parse2(self,r):
         deputado = r.meta['deputado']
-        deputado_detalhes = ET.fromstring(r.body).find('./Deputado')
+        deputado_detalhes = fromstring(r.body).find('./Deputado')
         dep = _create_item_from_element(deputado, deputado_detalhes)
         yield dep
 
