@@ -25,10 +25,9 @@ postgresql::server::db { 'DP':
 	password => '.',
 }
 
-
 package {
 	"git${BACKPORTS}":
-		ensure => latest
+		ensure => latest,
 		require => Apt::Source['debian_backports']
 	;'python2.7':
 		ensure => present
