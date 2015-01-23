@@ -13,17 +13,8 @@ BOT_NAME = 'scrap'
 SPIDER_MODULES = ['scrap.spiders']
 NEWSPIDER_MODULE = 'scrap.spiders'
 
-DATABASE = {
-	'drivername': 'postgres',
-	'host': 'localhost',
-	'port': '5432',
-	'username': 'vagrant',
-	'password': '.',
-	'database': 'DP'
-}
-
 ITEM_PIPELINES = {
-        'scrap.pipelines.ScrapPipeline': 300
+#        'scrap.pipelines.ScrapPipeline': 300
 }
 DOWNLOADER_MIDDLEWARES = {
 	'scrapy.contrib.downloadermiddleware.httpcache.HttpCacheMiddleware' : 500
