@@ -4,6 +4,7 @@
 if !Vagrant.has_plugin?("vagrant-timezone")
 	puts "There is a vagrant plugin missing, will attempt installation."
 	system('vagrant plugin install vagrant-timezone')
+	puts "Please run your vagrant command again!"
 end
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
