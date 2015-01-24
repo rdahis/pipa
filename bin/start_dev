@@ -4,3 +4,4 @@ set -e
 git submodule update --init
 vagrant up
 vagrant provision
+vagrant ssh
