@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import scrap.items as items
+import crawler.items as items
 
 # html
 import urllib
@@ -20,7 +20,7 @@ class CamaraSessoesSpider(scrapy.Spider):
     )
 
     def parse(self, response):
-        for delta in xrange(0,5000):
+        for delta in xrange(0,50):
             url = 'http://www.camara.gov.br/SitCamaraWS/sessoesreunioes.asmx/ListarPresencasDia'
             data_raw = date.today() - timedelta(days=delta)
             data = data_raw.strftime('%d/%m/%Y')

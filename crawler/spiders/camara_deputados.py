@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import scrap.items as items
+import crawler.items as items
 
 # html
 import urllib

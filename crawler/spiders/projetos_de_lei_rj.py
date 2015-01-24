@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-import scrap.items as items
+import crawler.items as items
 from urlparse import urlparse
 from bs4 import BeautifulSoup
 
