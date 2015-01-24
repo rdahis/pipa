@@ -13,8 +13,3 @@ def db_connect():
 
 def create_all_tables(engine):
     DeclarativeBase.metadata.create_all(engine)
-
-class OrgaoCargoCamara(DeclarativeBase):
-    __tablename__ = "OrgaosCargos"
-    id_cargo = Column(Integer, primary_key=True)
-    descricao = Column('descricao', String)

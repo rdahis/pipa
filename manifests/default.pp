@@ -49,5 +49,5 @@ package {
 		ensure => present
 }
 ->
-python::requirements { "${PROJECT_ROOT}/scrap/requirements.txt" :
+python::requirements { "${PROJECT_ROOT}/requirements.txt" :
 }
