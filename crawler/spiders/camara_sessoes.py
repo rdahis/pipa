@@ -20,11 +20,7 @@ class CamaraSessoesSpider(scrapy.Spider):
     )
 
     def parse(self, response):
-<<<<<<< HEAD:scrap/scrap/spiders/camara_sessoes.py
         for delta in xrange(0,100):
-=======
-        for delta in xrange(0,50):
->>>>>>> 268b6ac672f3aaabf8b1d7239135c7ef070620e8:crawler/spiders/camara_sessoes.py
             url = 'http://www.camara.gov.br/SitCamaraWS/sessoesreunioes.asmx/ListarPresencasDia'
             data_raw = date.today() - timedelta(days=delta)
             data = data_raw.strftime('%d/%m/%Y')
