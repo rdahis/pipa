@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from combiner.engine import DeclarativeBase
+from combiner.util import DeclarativeBase
+from sqlalchemy import Column, Integer, String, DateTime
 
 class CamaraFederalCargo(DeclarativeBase):
     __tablename__ = "camara_federal_cargo"
@@ -9,7 +10,8 @@ class CamaraFederalCargo(DeclarativeBase):
 
 
 raw_data = ['camara_orgaos_cargos']
-def combine(cls, data):
-    data = data['camara_orgaos_cargos']
+def combine(data):
+    data = data.camara_orgaos_cargos
     for item in data:
+        print(item)
         yield CamaraFederalCargo(**item)
