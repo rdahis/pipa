@@ -1,6 +1,7 @@
 """
 A combiner is 1-1 to a database table, it should know how to combine raw
 data to insert entries into the table.
+Combiners are responsible for getting the raw data, sanitizing it, mix and match, and send to the database
 """
 import os
 valid_combiners = os.listdir(os.path.dirname(os.path.realpath(__file__)))

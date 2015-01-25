@@ -13,5 +13,4 @@ raw_data = ['camara_orgaos_cargos']
 def combine(data):
     data = data.camara_orgaos_cargos
     for item in data:
-        print(item)
         yield CamaraFederalCargo(**item)
