@@ -37,7 +37,7 @@ package {
 
 file { '/etc/profile.d/dp-append-path.sh':
 	mode    => 644,
-	content => "PATH=\$PATH:${PROJECT_ROOT}/bin; export PYTHONPATH=\$PYTHONPATH:/DP",
+	content => "PATH=\$PATH:${PROJECT_ROOT}/bin; export PYTHONPATH=\$PYTHONPATH:$PROJECT_ROOT",
 }
 
 package {
@@ -55,6 +55,13 @@ package {
 }
 ->
 python::requirements { "${PROJECT_ROOT}/requirements.txt" :
+}
+
+tidy { 'clean_pyc':
+	path => $PROJECT_ROOT,
+	matches => '*.pyc',
+	age => 0,
+	recurse => inf
 }
 
 /*
