@@ -7,9 +7,9 @@ import settings
 DeclarativeBase = declarative_base()
 
 def db_connect():
-    """ Performs database connection using database settings from settings.py.
-    Returns sqlalchemy engine instance """
-    return create_engine(URL(**settings.DATABASE))
+	""" Performs database connection using database settings from settings.py.
+	Returns sqlalchemy engine instance """
+	return create_engine(URL(**settings.DATABASE))
 
 def create_all_tables(engine):
-    DeclarativeBase.metadata.create_all(engine)
+	DeclarativeBase.metadata.create_all(engine)
