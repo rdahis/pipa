@@ -26,5 +26,6 @@ HTTPCACHE_DIR='/tmp/httpcache'
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'crawler (+http://www.yourdomain.com)'
 
+FEED_EXPORTERS = {'csv': 'crawler.feedexport.CSVExport'}
 FEED_FORMAT='csv'
 FEED_URI='tmp/raw/%(name)s.csv'

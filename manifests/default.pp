@@ -40,6 +40,17 @@ file { '/etc/profile.d/dp-append-path.sh':
 	content => "PATH=\$PATH:${PROJECT_ROOT}/bin; export PYTHONPATH=\$PYTHONPATH:$PROJECT_ROOT",
 }
 
+exec { 'activate-global-python-argcomplete':
+	command => 'activate-global-python-argcomplete',
+	path => ['/usr/local/bin', '/usr/bin'],
+	creates => '/etc/bash_completion.d/python-argcomplete.sh'
+}
+exec {'scrapy-autocomplete':
+	command => 'wget https://raw.githubusercontent.com/scrapy/scrapy/master/extras/scrapy_bash_completion -O /etc/bash_completion.d/scrapy',
+	path => ['/usr/local/bin', '/usr/bin'],
+	creates => '/etc/bash_completion.d/scrapy'
+}
+
 package {
 	'postgresql-server-dev-9.4':
 		ensure => present,
