@@ -22,9 +22,9 @@ class CamaraPartidosSpider(scrapy.Spider):
 
 def _create_item_from_element(element):
     out = items.PartidoCamara()
-    out['id_partido_camara'] = element.find('idPartido')
-    out['partido'] = element.find('siglaPartido')
-    out['partido_nome'] = element.find('nomePartido')
-    out['partido_data_criacao'] = element.find('dataCriacao')
-    out['partido_data_extincao'] = element.find('dataExtincao')
+    out['partido_sigla'] = element.find('idPartido').text
+    out['partido'] = element.find('siglaPartido').text
+    out['partido_nome'] = element.find('nomePartido').text
+    out['partido_data_criacao'] = element.find('dataCriacao').text
+    out['partido_data_extincao'] = element.find('dataExtincao').text
     return out

@@ -53,7 +53,7 @@ class LiderBancada(scrapy.Item):
     bancada_nome = Field()
 
 class PartidoCamara(scrapy.Item):
-    id_partido_camara = Field()
+    partido_sigla = Field()
     partido = Field()
     partido_nome = Field()
     partido_data_criacao = Field()
