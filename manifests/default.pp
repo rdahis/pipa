@@ -43,12 +43,14 @@ file { '/etc/profile.d/dp-append-path.sh':
 exec { 'activate-global-python-argcomplete':
 	command => 'activate-global-python-argcomplete',
 	path => ['/usr/local/bin', '/usr/bin'],
-	creates => '/etc/bash_completion.d/python-argcomplete.sh'
+	creates => '/etc/bash_completion.d/python-argcomplete.sh',
+	require => Python::Requirements["${PROJECT_ROOT}/requirements.txt"]
 }
 exec {'scrapy-autocomplete':
 	command => 'wget https://raw.githubusercontent.com/scrapy/scrapy/master/extras/scrapy_bash_completion -O /etc/bash_completion.d/scrapy',
 	path => ['/usr/local/bin', '/usr/bin'],
-	creates => '/etc/bash_completion.d/scrapy'
+	creates => '/etc/bash_completion.d/scrapy',
+	require => Python::Requirements["${PROJECT_ROOT}/requirements.txt"]
 }
 
 package {
