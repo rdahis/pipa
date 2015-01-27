@@ -33,7 +33,7 @@ class DeputadoCamara(scrapy.Item):
 	uf = Field()
 	uf_representacao = Field()
 	condicao = Field()
-	matricula = Field()
+	id_matricula = Field()
 	profissao = Field()
 	data_nascimento = Field()
 	data_falecimento = Field()
