@@ -11,6 +11,9 @@ from lxml.etree import fromstring
 # Datetime
 from datetime import date, timedelta
 
+# Copy
+from copy import copy
+
 
 class CamaraSessoesSpider(scrapy.Spider):
 	name = "camara_sessoes"
@@ -49,7 +52,7 @@ def _create_item_from_element(element):
 	out['presenca_externa'] = element.find('presencaExterna').text
 	ret = []
 	for sessao in element.findall('./sessoesDia/sessaoDia'):
-		out_sub = out
+		out_sub = copy(out)
 		out_sub['inicio_sessao'] = sessao.find('inicio').text
 		out_sub['descricao_sessao'] = sessao.find('descricao').text
 		out_sub['frequencia_sessao'] = sessao.find('frequencia').text

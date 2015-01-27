@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from combiner.util import DeclarativeBase
+from combiner.util import DeclarativeBase, transform_dict
 from sqlalchemy import Column, Integer, String, DateTime
 
 class CamaraFederalDeputado(DeclarativeBase):
@@ -29,43 +29,126 @@ class CamaraFederalDeputado(DeclarativeBase):
 	email = Column('email', String)
 
 
-MODIFIED_COLUMNS = {
-	'id_deputado_federal': 'id_deputado_federal',
-	'id_deputado_federal_deprecated': 'e_id_deputado_federal_deprecated',
-	'id_cadastro': 'e_id_cadastro',
-	'id_matricula': 'e_id_matricula',
-	'id_uf': 'id_uf',
-	'uf_representacao': 'uf_representacao',
-	'nome': 'nome',
-	'nome_parlamentar': 'nome_parlamentar',
-	'legislatura': 'legislatura',
+raw2orm_translation = {
+	'ideCadastro': 'id_deputado_federal',
+	'idParlamentarDeprecated': 'e_id_deputado_federal_deprecated',
+	'ideCadastro': 'e_id_cadastro',
+	'matricula': 'e_id_matricula',
+	'uf': 'id_uf',
+	'ufRepresentacao': 'uf_representacao',
+	'nomeCivil': 'nome',
+	'nomeParlamentarAtual': 'nome_parlamentar',
+	'numLegislatura': 'legislatura',
 	'condicao': 'condicao',
-	'situacao': 'situacao',
-	'data_nascimento': 'data_nascimento',
-	'data_falecimento': 'data_falecimento',
-	'url_foto': 'url_foto',
-	'id_partido': 'id_partido',
-	'partido': None,
+	'situacaoNaLegislaturaAtual': 'situacao',
+	'dataNascimento': 'data_nascimento',
+	'dataFalecimento': 'data_falecimento',
+	'urlFoto': 'url_foto',
+	'idPartido': 'id_partido',
+	'sigla': None,
+	'nome': None,
 	'sexo': 'sexo',
-	'profissao': 'profissao',
-	'telefone': 'telefone',
-	'gabinete_numero': 'gabinete_numero',
-	'gabinete_anexo': 'gabinete_anexo',
+	'nomeProfissao': 'profissao',
+	'fone': 'telefone',
+	'numero': 'gabinete_numero',
+	'anexo': 'gabinete_anexo',
 	'email': 'email'
 }
 
-#f(item, RULES)
+# lideres bancadas
+raw2orm_translation2 = {
+	'nome': 'nome',
+	'id_cadastro': 'e_id_cadastro',
+	'partido': 'id_partido',
+	'uf': 'uf',
+	'posicao': 'posicao',
+	'sigla': 'bancada',
+	'nome': 'bancada_nome',
+}
+
+# Partidos
+row2orm_translation3 = {
+	'idPartido': 'id_partido',
+	'siglaPartido': 'partido_sigla',
+	'nomePartido': 'partido_nome',
+	'dataCriacao': 'partido_data_criacao',
+	'dataExtincao': 'partido_data_extincao',
+}
+
+# Orgaos Cargos
+raw2orm_translation4 = {
+	'id': 'id_cargo',
+	'descricao': 'cargo_descricao'
+}
+
+# Orgaos 
+raw2orm_translation5 = {
+	'id': 'id_orgao',
+	'descricao': 'orgao_descricao'
+}
+
+# Proposicoes
+raw2orm_translation6 = {
+	'id': 'id_proposicao',
+	'nome': 'proposicao_nome',
+	'tipoProposicao_id': 'e_id_tipo_proposicao',
+	'tipoProposicao_sigla': 'proposicao_sigla_tipo',
+	'tipoProposicao_nome': 'proposicao_nome_tipo',
+	'numero': 'proposicao_numero',
+	'ano': 'ano',
+	'orgaoNumerador_id': 'e_id_orgao_numerador',
+	'orgaoNumerador_sigla': 'orgao_numerador_sigla',
+	'orgaoNumerador_nome': 'orgao_numerador_nome',
+	'datApresentacao': 'data_apresentacao',
+	'txtEmenta': 'ementa_texto',
+	'txtExplicacaoEmenta': 'ementa_texto_explicacao',
+	'codRegime': 'e_id_regime',
+	'txtRegime': 'regime_texto',
+	'apreciacao_id': 'e_id_apreciacao',
+	'apreciacao_txtApreciacao': 'apreciacao_texto',
+	'txtNomeAutor': 'autor_nome',
+	'ideCadastro': 'e_id_cadastro',
+	'codPartido': 'id_partido',
+	'txtSiglaPartido': None,
+	'txtSiglaUF': 'uf',
+	'qtdAutores': 'autores_qtd',
+	'datDespacho': 'despacho_data',
+	'txtDespacho': 'despacho_texto',
+	'situacao_id': 'id_situacao',
+	'situacao_descricao': 'situacao_descricao',
+	'codOrgaoEstado': 'id_orgao',
+	'siglaOrgaoEstado': 'orgao_sigla',
+	'codProposicaoPrincipal': 'id_proposicao_principal',
+	'proposicaoPrincipal': 'proposicao_principal',
+	'indGenero': 'ind_genero',
+	'qtdOrgaosComEstado': 'orgaos_qtd'
+}
+
+# Sessoes
+raw2orm_translation7 = {
+	'carteiraParlamentar': "e_id_matricula",
+	'nomeParlamentar': "parlamentar_nome_cheio",
+	'siglaPartido': "id_partido",
+	'siglaUF': "uf",
+	'descricaoFrequenciaDia': "frequencia",
+	'justificativa': "justificativa",
+	'presencaExterna': "presenca_externa",
+	'sessaoDia_inicio': "sessao_inicio",
+	'sessaoDia_descricao': "sessao_descricao",
+	'sessaoDia_frequencia': "sessao_frequencia"
+}
 
 
 raw_data = ['camara_deputados']
 def combine(data):
 	data = data.camara_deputados
 	for item in data:
-		columns = get_columns(CamaraFederalDeputado)
+		#columns = get_columns(CamaraFederalDeputado)
 		#TODO: transform this line below into a dict comprehension
-		filtered_item = dict(filter(lambda (k,v): k in columns, item.items()))
-		filtered_item = sanitize_item(filtered_item)
-		yield CamaraFederalDeputado(**filtered_item)
+		translated_item = transform_dict(item, raw2orm_translation) 
+		#filtered_item = dict(filter(lambda (k,v): k in columns, item.items()))
+		sanitized_item = sanitize_item(translated_item)
+		yield CamaraFederalDeputado(**sanitized_item)
 
 def get_columns(cls):
 	return cls.__table__.columns.keys()

@@ -24,13 +24,13 @@ class LideresBancadasSpider(scrapy.Spider):
 def _create_item_from_element(posicao, bancada):
 	out = items.LiderBancada()
 	out['nome'] = posicao.find('nome').text
-	out['id_cadastro'] = posicao.find('ideCadastro').text
+	out['ideCadastro'] = posicao.find('ideCadastro').text
 	out['partido'] = posicao.find('partido').text
 	out['uf'] = posicao.find('uf').text
 	if posicao.tag == 'lider':
 		out['posicao'] = 'Lider'
 	elif posicao.tag == 'vice_lider':
 		out['posicao'] = 'Vice-Lider'
-	out['bancada'] = bancada.attrib['sigla']
-	out['bancada_nome'] = bancada.attrib['nome']
+	out['sigla'] = bancada.attrib['sigla']
+	out['nome'] = bancada.attrib['nome']
 	return out

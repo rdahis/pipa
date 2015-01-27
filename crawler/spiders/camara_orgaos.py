@@ -22,6 +22,6 @@ class CamaraOrgaosSpider(scrapy.Spider):
 
 def _create_item_from_element(element):
 	out = items.OrgaoCamara()
-	out['id_orgao'] = element.attrib['id']
+	out['id'] = element.attrib['id']
 	out['descricao'] = element.attrib['descricao']
 	return out

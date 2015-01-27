@@ -32,29 +32,29 @@ class CamaraDeputadosSpider(scrapy.Spider):
 
 def _create_item_from_element(element, element_detalhes):
 	out = items.DeputadoCamara()
-	out['id_cadastro'] = element.find('ideCadastro').text
-	out['id_deputado_federal'] = element.find('idParlamentar').text
-	out['id_orcamento'] = element.find('codOrcamento').text
+	out['ideCadastro'] = element.find('ideCadastro').text
+	out['idParlamentar'] = element.find('idParlamentar').text
+	out['codOrcamento'] = element.find('codOrcamento').text
 	out['condicao'] = element.find('condicao').text
 	out['matricula'] = element.find('matricula').text
 	#out['uf'] = element.find('uf').text
-	out['telefone'] = element.find('fone').text
-	out['url_foto'] = element.find('urlFoto').text
-	out['legislatura'] = element_detalhes.find('numLegislatura').text
+	out['fone'] = element.find('fone').text
+	out['urlFoto'] = element.find('urlFoto').text
+	out['numLegislatura'] = element_detalhes.find('numLegislatura').text
 	out['email'] = element_detalhes.find('email').text
-	out['profissao'] = element_detalhes.find('nomeProfissao').text
-	out['data_nascimento'] = element_detalhes.find('dataNascimento').text
-	out['data_falecimento'] = element_detalhes.find('dataFalecimento').text
-	out['uf_representacao'] = element_detalhes.find('ufRepresentacaoAtual').text
-	out['situacao'] = element_detalhes.find('situacaoNaLegislaturaAtual').text
-	out['id_deputado_federal_deprecated'] = element_detalhes.find('idParlamentarDeprecated').text
-	out['nome_parlamentar'] = element_detalhes.find('nomeParlamentarAtual').text
-	out['nome'] = element_detalhes.find('nomeCivil').text
+	out['nomeProfissao'] = element_detalhes.find('nomeProfissao').text
+	out['dataNascimento'] = element_detalhes.find('dataNascimento').text
+	out['dataFalecimento'] = element_detalhes.find('dataFalecimento').text
+	out['ufRepresentacaoAtual'] = element_detalhes.find('ufRepresentacaoAtual').text
+	out['situacaoNaLegislaturaAtual'] = element_detalhes.find('situacaoNaLegislaturaAtual').text
+	out['idParlamentarDeprecated'] = element_detalhes.find('idParlamentarDeprecated').text
+	out['nomeParlamentarAtual'] = element_detalhes.find('nomeParlamentarAtual').text
+	out['nomeCivil'] = element_detalhes.find('nomeCivil').text
 	out['sexo'] = element_detalhes.find('sexo').text
-	out['partido_sigla'] = element_detalhes.find('./partidoAtual/idPartido').text
-	out['partido'] = element_detalhes.find('./partidoAtual/sigla').text
-	out['partido_nome'] = element_detalhes.find('./partidoAtual/nome').text
-	out['gabinete_numero'] = element_detalhes.find('gabinete/numero').text
-	out['gabinete_anexo'] = element_detalhes.find('gabinete/anexo').text
+	out['idPartido'] = element_detalhes.find('./partidoAtual/idPartido').text
+	out['sigla'] = element_detalhes.find('./partidoAtual/sigla').text
+	out['nome'] = element_detalhes.find('./partidoAtual/nome').text
+	out['numero'] = element_detalhes.find('gabinete/numero').text
+	out['anexo'] = element_detalhes.find('gabinete/anexo').text
 	return out
 
