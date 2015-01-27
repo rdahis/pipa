@@ -14,7 +14,7 @@ DATABASE = {
 
 DeclarativeBase = declarative_base()
 
-def db_connect(cc):
+def db_connect():
 	# Nao to entendendo nada dessa merda, mas vambora
 	engine = create_engine(URL(**DATABASE))
 	create_all_tables(engine)
