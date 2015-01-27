@@ -23,3 +23,10 @@ def db_connect():
 
 def create_all_tables(engine):
 	DeclarativeBase.metadata.create_all(engine)
+
+def transform_dict(d, tr_rules):
+	ret = {}
+	for k,v in d.items():
+		if tr_rules[k]:
+			ret[tr_rules[k]] = v
+	return ret
