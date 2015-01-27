@@ -23,7 +23,6 @@ class DeputadoCamara(scrapy.Item):
 	codOrcamento = Field()
 	condicao = Field()
 	matricula = Field()
-	uf = Field()
 	fone = Field()
 	urlFoto = Field()
 	numLegislatura = Field()

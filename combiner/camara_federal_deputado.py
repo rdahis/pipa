@@ -9,9 +9,8 @@ class CamaraFederalDeputado(DeclarativeBase):
 	e_id_deputado_federal_deprecated = Column('e_id_deputado_federal_deprecated', Integer)
 	e_id_matricula = Column('e_id_matricula', Integer)
 	e_id_cadastro = Column('e_id_cadastro', Integer)
-	e_id_orcamento = Column('e_id_orcamento', Integer)
-	id_uf = Column('id_uf', Integer)
-	uf_representacao = Column('uf_representacao', String)
+	id_orcamento = Column('id_orcamento', Integer)
+	uf_representacao_atual = Column('uf_representacao_atual', String)
 	nome = Column('nome', String)
 	nome_parlamentar = Column('nome_parlamentar', String)
 	legislatura = Column('legislatura', Integer)
@@ -30,12 +29,13 @@ class CamaraFederalDeputado(DeclarativeBase):
 
 
 raw2orm_translation = {
+	'idParlamentar': 'id_deputado_federal',
 	'ideCadastro': 'id_deputado_federal',
 	'idParlamentarDeprecated': 'e_id_deputado_federal_deprecated',
 	'ideCadastro': 'e_id_cadastro',
 	'matricula': 'e_id_matricula',
-	'uf': 'id_uf',
-	'ufRepresentacao': 'uf_representacao',
+	'codOrcamento': 'id_orcamento',
+	'ufRepresentacaoAtual': 'uf_representacao_atual',
 	'nomeCivil': 'nome',
 	'nomeParlamentarAtual': 'nome_parlamentar',
 	'numLegislatura': 'legislatura',
