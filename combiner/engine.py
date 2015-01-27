@@ -25,8 +25,8 @@ def main():
 	except ImportError:
 		print("combiner '%s' does not exist" % args.combiner)
 		raise
-	requested_data = chosen_combiner.raw_data
 
+	requested_data = chosen_combiner.raw_data
 	session = db_connect(chosen_combiner)
 	Data = namedtuple(args.combiner + '_data', requested_data)
 	files = []
@@ -35,8 +35,8 @@ def main():
 		for f in requested_data:
 			f = RAW_DATA_DIR + '/' + f + '.csv'
 			files.append(io.open(f, 'rb'))
-			data = map(lambda x: DictReader(x, encoding='utf8'), files)
-			data = Data(*data)
+		data = map(lambda x: DictReader(x, encoding='utf8'), files)
+		data = Data(*data)
 		for item in chosen_combiner.combine(data):
 			_send_to_db(session, item)
 	finally:
