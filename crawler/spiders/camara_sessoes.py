@@ -28,10 +28,10 @@ class CamaraSessoesSpider(scrapy.Spider):
 			data_raw = date.today() - timedelta(days=delta)
 			data = data_raw.strftime('%d/%m/%Y')
 			params = urllib.urlencode({
-							            'data': data,
-							            'numMatriculaParlamentar': '',
-							            'siglaPartido': '',
-							            'siglaUF': ''
+					'data': data,
+					'numMatriculaParlamentar': '',
+					'siglaPartido': '',
+					'siglaUF': ''
 					 })
 			yield scrapy.http.Request(url + '?' + params, callback=self.parse2)
 
@@ -43,18 +43,18 @@ class CamaraSessoesSpider(scrapy.Spider):
 
 def _create_item_from_element(element):
 	out = items.PresencaSessaoDeputadoCamara()
-	out['matricula'] = element.find('carteiraParlamentar').text
-	out['nome_parlamentar_cheio'] = element.find('nomeParlamentar').text
-	out['partido_sigla'] = element.find('siglaPartido').text
-	out['uf'] = element.find('siglaUF').text
-	out['frequencia'] = element.find('descricaoFrequenciaDia').text
+	out['carteiraParlamentar'] = element.find('carteiraParlamentar').text
+	out['nomeParlamentar'] = element.find('nomeParlamentar').text
+	out['siglaPartido'] = element.find('siglaPartido').text
+	out['siglaUF'] = element.find('siglaUF').text
+	out['descricaoFrequenciaDia'] = element.find('descricaoFrequenciaDia').text
 	out['justificativa'] = element.find('justificativa').text
-	out['presenca_externa'] = element.find('presencaExterna').text
+	out['presencaExterna'] = element.find('presencaExterna').text
 	ret = []
 	for sessao in element.findall('./sessoesDia/sessaoDia'):
 		out_sub = copy(out)
-		out_sub['inicio_sessao'] = sessao.find('inicio').text
-		out_sub['descricao_sessao'] = sessao.find('descricao').text
-		out_sub['frequencia_sessao'] = sessao.find('frequencia').text
+		out_sub['sessaoDia_inicio'] = sessao.find('inicio').text
+		out_sub['sessaoDia_descricao'] = sessao.find('descricao').text
+		out_sub['sessaoDia_frequencia'] = sessao.find('frequencia').text
 		ret.append(out_sub)
 	return ret
