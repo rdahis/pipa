@@ -1,9 +1,16 @@
+# dev
+ipdb
+py.test
+
+# spiders
 scrapy
 service_identity
 beautifulsoup4
-psycopg2
-ipdb
-ElementTree
 sqlalchemy
+psycopg2
+lxml
+
+# combiners
 unicodecsv
 argcomplete
+argparse

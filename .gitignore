@@ -1,4 +1,4 @@
-*.swp
+*.sw[a-z]
 *.pyc
 *.pyo
 .vagrant
