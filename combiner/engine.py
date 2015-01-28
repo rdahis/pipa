@@ -10,7 +10,7 @@ import io
 from collections import namedtuple
 from combiner.util import db_connect
 
-RAW_DATA_DIR = 'tmp/raw'
+from combiner.settings import settings
 
 def main():
 	args = _get_user_input()
@@ -38,7 +38,7 @@ def _load_raw_data(raw_data_list):
 			self.files = []
 			# Accumulator pattern is needed in this case
 			for f in raw_data_list:
-				f = RAW_DATA_DIR + '/' + f + '.csv'
+				f = settings.RAW_DATA_DIR + '/' + f + '.csv'
 				self.files.append(io.open(f, 'rb'))
 			data = map(lambda x: DictReader(x, encoding='utf8'), self.files)
 			return RawData(*data)
