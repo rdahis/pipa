@@ -70,6 +70,12 @@ package {
 python::requirements {
 	"${PROJECT_ROOT}/requirements.txt" :
 }
+exec {'update_pip':
+	command => 'easy_install-2.7 -U pip',
+	path => ['/usr/local/bin', '/usr/bin'],
+	subscribe => Package['python-pip'],
+	require => Package['python-pip']
+}
 
 tidy { 'clean_pyc':
 	path => $PROJECT_ROOT,

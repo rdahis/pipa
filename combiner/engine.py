@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 # PYTHON_ARGCOMPLETE_OK
 
@@ -15,12 +15,13 @@ RAW_DATA_DIR = 'tmp/raw'
 def main():
 	args = _get_user_input()
 	combiner_module = _load_a_combiner(args.combiner)
-	iter_results = run_combiner(combiner_module)
-	_store_on_db(iter_results)
+	session = db_connect()
+	iter_results = run_combiner(combiner_module, session)
+	_store_on_db(iter_results, session)
 
-def run_combiner(combiner_module):
+def run_combiner(combiner_module, db_session):
 	with _load_raw_data(combiner_module.raw_data) as data:
-		for item in combiner_module.combine(data): yield item
+		for item in combiner_module.combine(data, db_session): yield item
 		# This generator is needed so that with does not close files
 
 def _get_user_input():
@@ -54,9 +55,8 @@ def _load_a_combiner(combiner_name):
 		print("Error! Combiner '%s' does not exist" % combiner_name)
 		raise
 
-def _store_on_db(iter_results):
+def _store_on_db(iter_results, session):
 	#TODO: meter um with aqui pra fechar a conexao
-	session = db_connect()
 	for item in iter_results:
 		_send_to_db(session, item)
 

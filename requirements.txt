@@ -1,6 +1,6 @@
 # dev
 ipdb
-py.test
+pytest
 
 # spiders
 scrapy
