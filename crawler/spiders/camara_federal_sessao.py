@@ -15,8 +15,8 @@ from datetime import date, timedelta
 from copy import copy
 
 
-class CamaraSessoesSpider(scrapy.Spider):
-	name = "camara_sessoes"
+class CamaraFederalSessaoSpider(scrapy.Spider):
+	name = "camara_federal_sessao"
 	allowed_domains = ["www.camara.gov.br"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/sessoesreunioes.asmx?op=ListarPresencasDia',
@@ -32,7 +32,7 @@ class CamaraSessoesSpider(scrapy.Spider):
 					'numMatriculaParlamentar': '',
 					'siglaPartido': '',
 					'siglaUF': ''
-					 })
+					})
 			yield scrapy.http.Request(url + '?' + params, callback=self.parse2)
 
 	def parse2(self, res):

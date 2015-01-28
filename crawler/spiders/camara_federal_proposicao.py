@@ -10,8 +10,8 @@ import urllib
 from lxml.etree import fromstring
 
 
-class CamaraProposicoesSpider(scrapy.Spider):
-	name = "camara_proposicoes"
+class CamaraFederalProposicaoSpider(scrapy.Spider):
+	name = "camara_federal_proposicao"
 	allowed_domains = ["www.camara.gov.br"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDeputados',

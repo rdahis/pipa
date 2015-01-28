@@ -44,12 +44,12 @@ class DeputadoCamara(scrapy.Item):
 
 class LiderBancada(scrapy.Item):
 	nome = Field()
-	id_cadastro = Field()
+	ideCadastro = Field()
 	partido = Field()
 	uf = Field()
 	posicao = Field()
-	sigla = Field()
-	nome = Field()
+	bancada_sigla = Field()
+	bancada_nome = Field()
 
 class PartidoCamara(scrapy.Item):
 	idPartido = Field()

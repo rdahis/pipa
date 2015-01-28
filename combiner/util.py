@@ -20,7 +20,6 @@ def db_connect():
 	create_all_tables(engine)
 	return sessionmaker(bind=engine)()
 
-
 def create_all_tables(engine):
 	DeclarativeBase.metadata.create_all(engine)
 
@@ -30,3 +29,13 @@ def transform_dict(d, tr_rules):
 		if tr_rules[k]:
 			ret[tr_rules[k]] = v
 	return ret
+
+def get_columns(cls):
+	return cls.__table__.columns.keys()
+
+def sanitize_item(item):
+	def clean(v):
+		if type(v) not in (str, unicode) : return v
+		v = v.strip()
+		return v if v != '' else None
+	return { k:clean(v) for k,v in item.items()}

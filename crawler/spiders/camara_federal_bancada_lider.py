@@ -7,8 +7,8 @@ import elementtree.ElementTree as ET
 from elementtree.ElementTree import Element, SubElement
 
 
-class LideresBancadasSpider(scrapy.Spider):
-	name = "camara_deputados_lideres_bancadas"
+class CamaraFederalLiderBancadaSpider(scrapy.Spider):
+	name = "camara_federal_bancada_lider"
 	allowed_domains = ["www2.camara.leg.br/"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterLideresBancadas',
@@ -31,6 +31,6 @@ def _create_item_from_element(posicao, bancada):
 		out['posicao'] = 'Lider'
 	elif posicao.tag == 'vice_lider':
 		out['posicao'] = 'Vice-Lider'
-	out['sigla'] = bancada.attrib['sigla']
-	out['nome'] = bancada.attrib['nome']
+	out['bancada_sigla'] = bancada.attrib['sigla']
+	out['bancada_nome'] = bancada.attrib['nome']
 	return out

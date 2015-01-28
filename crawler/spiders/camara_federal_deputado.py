@@ -10,7 +10,7 @@ from lxml.etree import fromstring
 
 
 class CamaraDeputadosSpider(scrapy.Spider):
-	name = "camara_deputados"
+	name = "camara_federal_deputado"
 	allowed_domains = ["www.camara.gov.br"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDeputados',

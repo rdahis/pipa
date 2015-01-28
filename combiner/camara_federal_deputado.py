@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from combiner.util import DeclarativeBase, transform_dict
+from combiner.util import DeclarativeBase, transform_dict, get_columns, sanitize_item
 from sqlalchemy import Column, Integer, String, DateTime
 
 class CamaraFederalDeputado(DeclarativeBase):
@@ -55,17 +55,6 @@ raw2orm_translation = {
 	'email': 'email'
 }
 
-# lideres bancadas
-raw2orm_translation2 = {
-	'nome': 'nome',
-	'id_cadastro': 'e_id_cadastro',
-	'partido': 'id_partido',
-	'uf': 'uf',
-	'posicao': 'posicao',
-	'sigla': 'bancada',
-	'nome': 'bancada_nome',
-}
-
 # Partidos
 row2orm_translation3 = {
 	'idPartido': 'id_partido',
@@ -87,59 +76,7 @@ raw2orm_translation5 = {
 	'descricao': 'orgao_descricao'
 }
 
-# Proposicoes
-raw2orm_translation6 = {
-	'id': 'id_proposicao',
-	'nome': 'proposicao_nome',
-	'tipoProposicao_id': 'e_id_tipo_proposicao',
-	'tipoProposicao_sigla': 'proposicao_sigla_tipo',
-	'tipoProposicao_nome': 'proposicao_nome_tipo',
-	'numero': 'proposicao_numero',
-	'ano': 'ano',
-	'orgaoNumerador_id': 'e_id_orgao_numerador',
-	'orgaoNumerador_sigla': 'orgao_numerador_sigla',
-	'orgaoNumerador_nome': 'orgao_numerador_nome',
-	'datApresentacao': 'data_apresentacao',
-	'txtEmenta': 'ementa_texto',
-	'txtExplicacaoEmenta': 'ementa_texto_explicacao',
-	'codRegime': 'e_id_regime',
-	'txtRegime': 'regime_texto',
-	'apreciacao_id': 'e_id_apreciacao',
-	'apreciacao_txtApreciacao': 'apreciacao_texto',
-	'txtNomeAutor': 'autor_nome',
-	'ideCadastro': 'e_id_cadastro',
-	'codPartido': 'id_partido',
-	'txtSiglaPartido': None,
-	'txtSiglaUF': 'uf',
-	'qtdAutores': 'autores_qtd',
-	'datDespacho': 'despacho_data',
-	'txtDespacho': 'despacho_texto',
-	'situacao_id': 'id_situacao',
-	'situacao_descricao': 'situacao_descricao',
-	'codOrgaoEstado': 'id_orgao',
-	'siglaOrgaoEstado': 'orgao_sigla',
-	'codProposicaoPrincipal': 'id_proposicao_principal',
-	'proposicaoPrincipal': 'proposicao_principal',
-	'indGenero': 'ind_genero',
-	'qtdOrgaosComEstado': 'orgaos_qtd'
-}
-
-# Sessoes
-raw2orm_translation7 = {
-	'carteiraParlamentar': "e_id_matricula",
-	'nomeParlamentar': "parlamentar_nome_cheio",
-	'siglaPartido': "id_partido",
-	'siglaUF': "uf",
-	'descricaoFrequenciaDia': "frequencia",
-	'justificativa': "justificativa",
-	'presencaExterna': "presenca_externa",
-	'sessaoDia_inicio': "sessao_inicio",
-	'sessaoDia_descricao': "sessao_descricao",
-	'sessaoDia_frequencia': "sessao_frequencia"
-}
-
-
-raw_data = ['camara_deputados']
+raw_data = ['camara_federal_deputados']
 def combine(data):
 	data = data.camara_deputados
 	for item in data:
@@ -149,17 +86,3 @@ def combine(data):
 		#filtered_item = dict(filter(lambda (k,v): k in columns, item.items()))
 		sanitized_item = sanitize_item(translated_item)
 		yield CamaraFederalDeputado(**sanitized_item)
-
-def get_columns(cls):
-	return cls.__table__.columns.keys()
-
-def sanitize_item(item):
-	def clean(v):
-		if type(v) not in (str, unicode) : return v
-		v = v.strip()
-		return v if v != '' else None
-	return { k:clean(v) for k,v in item.items()}
-
-#funcao para pegar todas as colunas da classe. output uma lista
-#funcao filter (que ja existe) pra filtrar caras que nao tao na chamada 1a funcao
-#por ultimo, apos receber

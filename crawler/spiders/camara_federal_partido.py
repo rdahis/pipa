@@ -7,8 +7,8 @@ import elementtree.ElementTree as ET
 from elementtree.ElementTree import Element, SubElement
 
 
-class CamaraPartidosSpider(scrapy.Spider):
-	name = "camara_partidos"
+class CamaraFederalPartidoSpider(scrapy.Spider):
+	name = "camara_federal_partido"
 	allowed_domains = ["www2.camara.leg.br/"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterPartidosCD',

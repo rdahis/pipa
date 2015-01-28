@@ -21,9 +21,9 @@ raw2orm_translation = {
 }
 
 
-raw_data = ['camara_partidos']
+raw_data = ['camara_federal_partido']
 def combine(data):
-	data = data.camara_partidos
+	data = data.camara_federal_partido
 	for item in data:
 		translated_item = transform_dict(item, raw2orm_translation) 
 		sanitized_item = sanitize_item(translated_item)
