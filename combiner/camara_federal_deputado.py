@@ -77,12 +77,9 @@ raw2orm_translation5 = {
 }
 
 raw_data = ['camara_federal_deputados']
-def combine(data):
+def combine(data, db):
 	data = data.camara_deputados
 	for item in data:
-		#columns = get_columns(CamaraFederalDeputado)
-		#TODO: transform this line below into a dict comprehension
 		translated_item = transform_dict(item, raw2orm_translation) 
-		#filtered_item = dict(filter(lambda (k,v): k in columns, item.items()))
 		sanitized_item = sanitize_item(translated_item)
 		yield CamaraFederalDeputado(**sanitized_item)

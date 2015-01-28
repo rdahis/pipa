@@ -81,7 +81,7 @@ raw2orm_translation = {
 
 
 raw_data = ['camara_federal_proposicao']
-def combine(data):
+def combine(data, db):
 	data = data.camara_federal_proposicao
 	for item in data:
 		translated_item = transform_dict(item, raw2orm_translation) 

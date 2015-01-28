@@ -10,6 +10,6 @@ class CamaraFederalCargo(DeclarativeBase):
 
 
 raw_data = ['camara_orgaos_cargos']
-def combine(data):
+def combine(data, db):
 	for item in data.camara_orgaos_cargos:
 		yield CamaraFederalCargo(**item)

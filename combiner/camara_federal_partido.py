@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from combiner.util import DeclarativeBase, transform_dict
+from combiner.util import DeclarativeBase, transform_dict, sanitize_item
 from sqlalchemy import Column, Integer, String, DateTime
 
 class CamaraFederalPartido(DeclarativeBase):
@@ -22,19 +22,9 @@ raw2orm_translation = {
 
 
 raw_data = ['camara_federal_partido']
-def combine(data):
+def combine(data, db):
 	data = data.camara_federal_partido
 	for item in data:
 		translated_item = transform_dict(item, raw2orm_translation) 
 		sanitized_item = sanitize_item(translated_item)
 		yield CamaraFederalPartido(**sanitized_item)
-
-def get_columns(cls):
-	return cls.__table__.columns.keys()
-
-def sanitize_item(item):
-	def clean(v):
-		if type(v) not in (str, unicode) : return v
-		v = v.strip()
-		return v if v != '' else None
-	return { k:clean(v) for k,v in item.items()}
