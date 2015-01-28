@@ -67,7 +67,8 @@ package {
 		ensure => present
 }
 ->
-python::requirements { "${PROJECT_ROOT}/requirements.txt" :
+python::requirements {
+	"${PROJECT_ROOT}/requirements.txt" :
 }
 
 tidy { 'clean_pyc':
@@ -78,32 +79,32 @@ tidy { 'clean_pyc':
 }
 
 /*
-package {
-	#;'python3-pip':
-	#	ensure => present,
-	#;'python3-dev':
-	#	ensure => present,
-}
-class { 'python' :
-	version    => '3.2',
-	pip        => true,
-	dev        => true,
-	virtualenv => true,
-}
-->
-exec { "pip":
-	command => "/usr/bin/easy_install-2.7 --upgrade pip"
-}
-
-$path_requirements_file = "$PROJECT_ROOT/combiner/requirements.txt"
-file { $path_requirements_file:
-		checksum => 'md5',
-		ensure => exists,
-		notify => Exec["pip_requirements_install"],
-}
-
-exec { "pip_requirements_install":
-	command     => "/usr/bin/pip-3.2 install -r ${path_requirements_file}",
-	refreshonly => true,
-}
+#package {
+#	#;'python3-pip':
+#	#	ensure => present,
+#	#;'python3-dev':
+#	#	ensure => present,
+#}
+#class { 'python' :
+#	version    => '3.2',
+#	pip        => true,
+#	dev        => true,
+#	virtualenv => true,
+#}
+#->
+#exec { "pip":
+#	command => "/usr/bin/easy_install-2.7 --upgrade pip"
+#}
+#
+#$path_requirements_file = "$PROJECT_ROOT/combiner/requirements.txt"
+#file { $path_requirements_file:
+#		checksum => 'md5',
+#		ensure => exists,
+#		notify => Exec["pip_requirements_install"],
+#}
+#
+#exec { "pip_requirements_install":
+#	command     => "/usr/bin/pip-3.2 install -r ${path_requirements_file}",
+#	refreshonly => true,
+#}
 */
