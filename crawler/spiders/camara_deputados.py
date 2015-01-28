@@ -37,7 +37,6 @@ def _create_item_from_element(element, element_detalhes):
 	out['codOrcamento'] = element.find('codOrcamento').text
 	out['condicao'] = element.find('condicao').text
 	out['matricula'] = element.find('matricula').text
-	#out['uf'] = element.find('uf').text
 	out['fone'] = element.find('fone').text
 	out['urlFoto'] = element.find('urlFoto').text
 	out['numLegislatura'] = element_detalhes.find('numLegislatura').text

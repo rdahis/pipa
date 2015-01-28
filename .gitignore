@@ -3,3 +3,4 @@
 *.pyo
 .vagrant
 tmp
+*.DS_Store
