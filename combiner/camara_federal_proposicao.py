@@ -25,6 +25,11 @@ class CamaraFederalProposicao(DeclarativeBase):
 	#ind_genero = Column('ind_genero', String)
 	orgaos_qtd = Column('orgaos_qtd', Integer)
 
+class CamaraFederalProposicaoTipo(DeclarativeBase):
+	__tablename__ = "camara_federal_proposicao_tipo"
+	id_proposicao_tipo = Column(Integer, primary_key=True)
+	proposicao_tipo_sigla = Column('proposicao_tipo_sigla', String)
+	proposicao_tipo_nome = Column('proposicao_tipo_nome', String)
 
 
 
@@ -84,6 +89,12 @@ raw_data = ['camara_federal_proposicao']
 def combine(data, db):
 	data = data.camara_federal_proposicao
 	for item in data:
+		item = sanitize_item(item)
 		translated_item = transform_dict(item, raw2orm_translation) 
-		sanitized_item = sanitize_item(translated_item)
-		yield CamaraFederalProposicao(**sanitized_item)
+
+		yield CamaraFederalProposicaoTipo(
+			proposicao_tipo_sigla=item['tipoProposicao_sigla'],
+			proposicao_tipo_nome=item['tipoProposicao_nome']
+			)
+
+		yield CamaraFederalProposicao(**item)

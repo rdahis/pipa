@@ -9,7 +9,7 @@ class CamaraFederalCargo(DeclarativeBase):
 	descricao = Column('descricao', String)
 
 
-raw_data = ['camara_orgaos_cargos']
+raw_data = ['camara_federal_cargo']
 def combine(data, db):
-	for item in data.camara_orgaos_cargos:
+	for item in data.camara_federal_cargo:
 		yield CamaraFederalCargo(**item)
