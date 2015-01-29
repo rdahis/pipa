@@ -12,6 +12,9 @@ from combiner.util import db_connect
 
 from combiner.settings import settings
 
+# TODO: logs
+# TODO: Turn into proper python package
+
 def main():
 	args = _get_user_input()
 	combiner_module = _load_a_combiner(args.combiner)
