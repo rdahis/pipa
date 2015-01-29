@@ -16,28 +16,25 @@ class CamaraFederalDeputadoBancada(DeclarativeBase):
 	posicao = Column('posicao', String)
 
 
-raw2orm_translation = {
-	#'nome': 'nome',
-	'nome': None,
-	#'id_cadastro': 'id_deputado_federal',
-	'ideCadastro': None,
-	#'partido': 'partido',
-	'partido': None,
-	#'uf': 'uf',
-	'uf': None,
-	#'posicao': 'posicao',
-	'posicao': None,
-	'bancada_sigla': 'bancada_sigla',
-	'bancada_nome': 'bancada_nome',
-}
-
-
-raw_data = ['camara_federal_lider_bancada']
+raw_data = ['camara_federal_bancada_lider']
 def combine(data, db):
-	data = data.camara_federal_lider_bancada
+	data = data.camara_federal_bancada_lider
+	last_bancada_sigla = None
 	for item in data:
+		item = sanitize_item(item)
 		translated_item = transform_dict(item, raw2orm_translation) 
-		sanitized_item = sanitize_item(translated_item)
-		yield CamaraFederalBancada(**sanitized_item)
-
+		#TODO: converter esse if para dados estruturados em json e so pegar os titulos
+		if last_bancada_sigla != item['bancada_sigla']:
+			last_bancada_sigla = item['bancada_sigla']
+			bancada = CamaraFederalBancada(
+				bancada_sigla=item['bancada_sigla'],
+				bancada_nome=item['bancada_nome'],
+				)
+			yield bancada
+		deputado_bancada = CamaraFederalDeputadoBancada(
+			id_deputado=item['ideCadastro'],
+			id_bancada=bancada.id_bancada,
+			posicao=item['posicao']
+			)
+		yield deputado_bancada
 

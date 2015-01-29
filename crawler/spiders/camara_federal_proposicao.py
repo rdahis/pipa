@@ -47,6 +47,7 @@ class CamaraFederalProposicaoSpider(scrapy.Spider):
 
 def _create_item_from_element(element):
 	out = items.ProposicaoCamara()
+	#XXX-JSON change this crap
 	out['id'] = element.find('id').text
 	out['nome'] = element.find('nome').text
 	out['tipoProposicao_id'] = element.find('tipoProposicao/id').text

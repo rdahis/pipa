@@ -55,27 +55,6 @@ raw2orm_translation = {
 	'email': 'email'
 }
 
-# Partidos
-row2orm_translation3 = {
-	'idPartido': 'id_partido',
-	'siglaPartido': 'partido_sigla',
-	'nomePartido': 'partido_nome',
-	'dataCriacao': 'partido_data_criacao',
-	'dataExtincao': 'partido_data_extincao',
-}
-
-# Orgaos Cargos
-raw2orm_translation4 = {
-	'id': 'id_cargo',
-	'descricao': 'cargo_descricao'
-}
-
-# Orgaos 
-raw2orm_translation5 = {
-	'id': 'id_orgao',
-	'descricao': 'orgao_descricao'
-}
-
 
 combiners_needed = ['camara_federal_partido']
 raw_data = ['camara_federal_deputado']
