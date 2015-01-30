@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy import Field
-from scrapy.http import HtmlResponse
+from scrapy.http import HtmlResponse, Request
 
 class TestSpider(scrapy.Spider):
 	name = "test"
@@ -21,3 +21,15 @@ class TestSpider(scrapy.Spider):
 class ComplexItem(scrapy.Item):
 	plain = Field()
 	complex = Field()
+
+class TestZipSpider(scrapy.Spider):
+	name = "test_zip"
+	def start_requests(self):
+		return [
+		Request('http://download.thinkbroadband.com/1GB.zip'),
+		]
+
+	def parse(self, response):
+		import ipdb;ipdb.set_trace()
+
+		pass

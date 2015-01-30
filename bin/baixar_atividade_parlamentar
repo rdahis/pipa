@@ -1,0 +1,2 @@
+#!/bin/bash
+curl http://www.camara.gov.br/cotas/AnoAtual.zip > tmp/csv_atividade_parlamentar_zip/AnoAtual-`date +%Y-%m-%d`.zip
