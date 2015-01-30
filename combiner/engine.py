@@ -11,9 +11,14 @@ from collections import namedtuple
 from combiner.util import db_connect
 
 from combiner.settings import settings
+from glob import glob
+import json
+import os
 
 # TODO: logs
 # TODO: Turn into proper python package
+
+SUPPORTED_FORMATS = ('csv', 'jsonlines')
 
 def main():
 	args = _get_user_input()
@@ -39,15 +44,34 @@ def _load_raw_data(raw_data_list):
 	class ctx_manager(object):
 		def __enter__(self):
 			self.files = []
+			data = []
 			# Accumulator pattern is needed in this case
 			for f in raw_data_list:
-				f = settings.RAW_DATA_DIR + '/' + f + '.csv'
-				self.files.append(io.open(f, 'rb'))
-			data = map(lambda x: DictReader(x, encoding='utf8'), self.files)
+				file, reader = _get_file_and_reader_from_basename(f)
+				self.files.append(file)
+				data.append(reader)
 			return RawData(*data)
 		def __exit__(self, *exception):
 			for f in self.files: f.__exit__()
 	return ctx_manager()
+
+def _get_file_and_reader_from_basename(path):
+	path = settings.RAW_DATA_DIR + '/' + path
+	filenames = glob(path + '.*')
+	filenames = list(filter(lambda fn: fn[len(path)+1:] in SUPPORTED_FORMATS, filenames))
+	if len(filenames) > 1: raise Exception('Ambiguous raw_file name: "%s"! There are more than one possible raw files: %s' % (path, filenames))
+	if not filenames: raise Exception('No rawfiles found for "%s"' % path)
+	filename = filenames[0]
+	extension = filename[len(path)+1:]
+	file = open(filename, 'r')
+	if extension == 'csv':
+		reader = DictReader(file, encoding='utf8')
+	elif extension == 'jsonlines':
+		def JsonLinesReader(f):
+			for line in f:
+				yield json.loads(line)
+		reader = JsonLinesReader(file)
+	return file, reader
 
 def _load_a_combiner(combiner_name):
 	from importlib import import_module
