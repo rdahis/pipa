@@ -64,11 +64,17 @@ def combine(data, db):
 		item = sanitize_item(item)
 		translated_item = transform_dict(item, raw2orm_translation) 
 		deputado = CamaraFederalDeputado(**translated_item)
-		partido = db.query(CamaraFederalPartido).filter_by(e_id_partido=item['idPartido']).all()
-		assert len(partido) == 1
-		partido = partido[0]
 		yield deputado
-		yield CamaraFederalDeputadoPartido(id_deputado=deputado.id_deputado, id_partido=partido.id_partido, data_ingresso=datetime.date.today())
+		partido = db.query(CamaraFederalPartido).filter_by(e_id_partido=item['idPartido']).all()
+		if partido:
+			assert len(partido) == 1
+			partido = partido[0]
+			deputado_partido = CamaraFederalDeputadoPartido(
+				id_deputado=deputado.id_deputado,
+				id_partido=partido.id_partido,
+				data_ingresso=datetime.date.today()
+			)
+			yield deputado_partido
 
 
 class CamaraFederalDeputadoPartido(DeclarativeBase):
@@ -77,8 +83,8 @@ class CamaraFederalDeputadoPartido(DeclarativeBase):
 	id_partido = Column(Integer, ForeignKey(CamaraFederalPartido.id_partido), primary_key=True)
 	data_ingresso = Column('data_ingresso', Date, primary_key=True)
 
-class CamaraFederalDeputadoCondicao(DeclarativeBase):
-	__tablename__ = "camara_federal_deputado_condicao"
-	id_deputado = Column(Integer, ForeignKey(CamaraFederalDeputado.id_deputado), primary_key=True)
-	id_condicao = Column(Integer, ForeignKey(CamaraFederalCondicao.id_condicao), primary_key=True)
-	data_mudanca = Column('data_mudanca', Date, primary_key=True)
+#class CamaraFederalDeputadoCondicao(DeclarativeBase):
+#	__tablename__ = "camara_federal_deputado_condicao"
+#	id_deputado = Column(Integer, ForeignKey(CamaraFederalDeputado.id_deputado), primary_key=True)
+#	id_condicao = Column(Integer, ForeignKey(CamaraFederalDeputado.id_condicao), primary_key=True)
+#	data_mudanca = Column('data_mudanca', Date, primary_key=True)

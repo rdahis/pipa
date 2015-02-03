@@ -8,7 +8,7 @@ from elementtree.ElementTree import Element, SubElement
 
 
 class CamaraOrgaosSpider(scrapy.Spider):
-	name = "camara_orgaos"
+	name = "camara_federal_orgao"
 	allowed_domains = ["www2.camara.leg.br/"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/Orgaos.asmx/ListarTiposOrgaos',

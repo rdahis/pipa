@@ -12,4 +12,7 @@ class CamaraFederalCargo(DeclarativeBase):
 raw_data = ['camara_federal_cargo']
 def combine(data, db):
 	for item in data.camara_federal_cargo:
-		yield CamaraFederalCargo(**item)
+		yield CamaraFederalCargo(
+			id_cargo=item['id'],
+			descricao=item['descricao']
+		)

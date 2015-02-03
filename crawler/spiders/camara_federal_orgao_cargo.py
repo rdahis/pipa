@@ -7,7 +7,7 @@ from scrapy.http import HtmlResponse
 from lxml.etree import fromstring
 
 class CamaraOrgaosCargosSpider(scrapy.Spider):
-	name = "camara_orgaos_cargos"
+	name = "camara_federal_cargo"
 	allowed_domains = ["www2.camara.leg.br/"]
 	start_urls = (
 		'http://www.camara.gov.br/SitCamaraWS/Orgaos.asmx/ListarCargosOrgaosLegislativosCD',

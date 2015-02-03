@@ -55,5 +55,7 @@ def _create_item_from_element(element, element_detalhes):
 	out['nome'] = element_detalhes.find('./partidoAtual/nome').text
 	out['numero'] = element_detalhes.find('gabinete/numero').text
 	out['anexo'] = element_detalhes.find('gabinete/anexo').text
+
+
 	return out
 
