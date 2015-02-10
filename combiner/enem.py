@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from combiner.util import DeclarativeBase, transform_dict, sanitize_item, Commit
+from combiner.util import DeclarativeBase, transform_dict, sanitize_item, Commit, get_or_create
 from sqlalchemy import Column, Integer, BigInteger, ForeignKey, String, DateTime, Enum, Boolean
 from sqlalchemy.orm import relationship
 
 class Aluno(DeclarativeBase):
 	__tablename__ = "aluno"
 	#__table_args__ = {'schema':'enem'}
-	id_aluno = Column('id_aluno', BigInteger, primary_key=True)
-	idade = Column('idade', Integer)
-	sexo = Column('sexo', Enum('M', 'F', name='sexo'))
-	situacao_ensino_medio = Column('situacao_ensino_medio', String)
-	ano_concluiu_ensino_medio = Column('ano_concluiu_ensino_medio', Integer)
-	estado_civil = Column('estado_civil', String)
-	cor_raca = Column('cor_raca' ,String)
+	id_aluno = Column(BigInteger, primary_key=True)
+	idade = Column(Integer)
+	sexo = Column(Enum('M', 'F', name='sexo'))
+	situacao_ensino_medio = Column(String)
+	ano_concluiu_ensino_medio = Column(Integer)
+	estado_civil = Column(String)
+	cor_raca = Column(String)
+	id_escola = Column(ForeignKey('escola.id_escola'))
+	escola = relationship('Escola')
 
 _Presenca = Enum('Faltou', 'Presente', 'Eliminado', name='presenca')
 class Aplicacao(DeclarativeBase):
@@ -54,6 +56,17 @@ class NecessidadeEspecial(DeclarativeBase):
 	aluno = relationship(Aluno, secondary='aluno_x_necessidade_especial',
 			backref="necessidade_especial")
 
+_AdmnistracaoEscola = Enum('Federal', 'Estadual', 'Municipal', 'Privada', name='administracao_escola')
+_ZonaEscola = Enum('Urbana', 'Rural', name='zona_escola')
+_SituacaoEscola = Enum('Em Atividade', 'Paralisada', 'Extinta', 'Extinta em anos anteriores', name='situacao_escola')
+class Escola(DeclarativeBase):
+	__tablename__ = 'escola'
+	id_escola = Column(Integer, primary_key=True)
+	administracao = Column(_AdmnistracaoEscola)
+	#tipo_instituicao = Column()
+	zona = Column(_ZonaEscola)
+	situacao = Column(_SituacaoEscola)
+
 raw_data = ['dados_enem_2012']
 def combine(data, db):
 	data = data.dados_enem_2012
@@ -62,6 +75,7 @@ def combine(data, db):
 	for item in data:
 		counter +=1
 		if counter % 1000 == 0: yield Commit
+		escola = _get_escola(db, item)
 		aluno = Aluno(
 			id_aluno=item['NU_INSCRICAO'],
 			idade=item['IDADE'],
@@ -70,10 +84,22 @@ def combine(data, db):
 			ano_concluiu_ensino_medio= item['ANO_CONCLUIU'] if item['ANO_CONCLUIU'].isdigit() else None,
 			estado_civil=item['TP_ESTADO_CIVIL'],
 			cor_raca=item['TP_COR_RACA'],
+			escola=escola,
 		)
 		__add_necessidade_especial(item, aluno)
 		aplicacao = __aplicacao(item, aluno)
 		yield aplicacao
+
+def _get_escola(db, item):
+	if item['PK_COD_ENTIDADE'] == '.': return None
+	return get_or_create(db, Escola,
+		id_escola=item['PK_COD_ENTIDADE'],
+		administracao=( {'1': 'Federal', '2':'Estadual', '3':'Municipal', '4':'Privada', '.':None}
+				[item['ID_DEPENDENCIA_ADM']]),
+		zona=( {'1':'Urbana', '2':'Rural', '.':None}[item['ID_LOCALIZACAO']]),
+		situacao=( {'1':'Em Atividade', '2':'Paralisada', '3':'Extinta', '4':'Extinta em anos anteriores', '.':None}
+				[item['SIT_FUNC']]),
+	)
 
 NECESSIDADES = {}
 

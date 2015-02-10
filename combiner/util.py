@@ -41,3 +41,11 @@ def sanitize_item(item):
 	return { k:clean(v) for k,v in item.items()}
 
 class Commit(object): pass
+
+def get_or_create(db, cls, **kwargs):
+	instance = db.query(cls).filter_by(**kwargs).first()
+	if instance:
+		return instance
+	else:
+		instance = cls(**kwargs)
+		return instance
