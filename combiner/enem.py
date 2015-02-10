@@ -41,10 +41,23 @@ class Aplicacao(DeclarativeBase):
 	redacao_comp5 = Column(String)
 	nota_redacao = Column(String)
 
+class AlunoXNecessidadeEspecial(DeclarativeBase):
+	__tablename__ = "aluno_x_necessidade_especial"
+	id_aluno = Column(ForeignKey(Aluno.id_aluno), primary_key=True)
+	id_necessidade_especial = Column(ForeignKey(
+			'necessidade_especial.id_necessidade_especial'), primary_key=True)
+
+class NecessidadeEspecial(DeclarativeBase):
+	__tablename__ = "necessidade_especial"
+	id_necessidade_especial = Column(Integer, primary_key=True)
+	nome = Column(String)
+	aluno = relationship(Aluno, secondary='aluno_x_necessidade_especial',
+			backref="necessidade_especial")
 
 raw_data = ['dados_enem_2012']
 def combine(data, db):
 	data = data.dados_enem_2012
+	_create_necessidade_especiais()
 	counter = 0
 	for item in data:
 		counter +=1
@@ -58,8 +71,48 @@ def combine(data, db):
 			estado_civil=item['TP_ESTADO_CIVIL'],
 			cor_raca=item['TP_COR_RACA'],
 		)
+		__add_necessidade_especial(item, aluno)
 		aplicacao = __aplicacao(item, aluno)
 		yield aplicacao
+
+NECESSIDADES = {}
+
+def __add_necessidade_especial(item, aluno):
+	for k,v in NECESSIDADES.items():
+		if item[k] == '1':
+			aluno.necessidade_especial.append(v)
+
+def _create_necessidade_especiais():
+	NECESSIDADES_TRANSFORM = {
+		'IN_UNIDADE_HOSPITALAR': 'unidade_hospitalar',
+		'IN_BAIXA_VISAO': 'baixa_visao',
+		'IN_CEGUEIRA': 'cegueira',
+		'IN_SURDEZ': 'surdez',
+		'IN_DEFICIENCIA_AUDITIVA': 'deficiencia_auditiva',
+		'IN_SURDO_CEGUEIRA': 'surdo_cegueira',
+		'IN_DEFICIENCIA_FISICA': 'deficiencia_fisica',
+		'IN_DEFICIENCIA_MENTAL': 'deficiencia_mental',
+		'IN_DEFICIT_ATENCAO': 'deficit_atencao',
+		'IN_DISLEXIA': 'dislexia',
+		'IN_GESTANTE': 'gestante',
+		'IN_LACTANTE': 'lactante',
+		'IN_IDOSO': 'idoso',
+		'IN_AUTISMO': 'autismo',
+		'IN_SABATISTA': 'sabatista',
+		'IN_BRAILLE': 'braille',
+		'IN_AMPLIADA': 'ampliada',
+		'IN_LEDOR': 'ledor',
+		'IN_ACESSO': 'acesso',
+		'IN_TRANSCRICAO': 'transcricao',
+		'IN_LIBRAS': 'libras',
+		'IN_LEITURA_LABIAL': 'leitura_labial',
+		'IN_MESA_CADEIRA_RODAS': 'mesa_cadeira_rodas',
+		'IN_MESA_CADEIRA_SEPARADA': 'mesa_cadeira_separada',
+		'IN_APOIO_PERNA': 'apoio_perna',
+		'IN_GUIA_INTERPRETE': 'guia_interprete',
+	}
+	for k,v in NECESSIDADES_TRANSFORM.items():
+		NECESSIDADES[k] = NecessidadeEspecial(nome=v)
 
 def __aplicacao(item, aluno):
 	return Aplicacao(
@@ -85,7 +138,6 @@ def __aplicacao(item, aluno):
 			nota_redacao=item['NU_NOTA_REDACAO'],
 			aluno=aluno,
 	)
-
 
 def __presenca(item,sub):
 	pres = int(item[sub])
