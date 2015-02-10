@@ -8,7 +8,7 @@ from unicodecsv import DictReader
 from combiner import valid_combiners
 import io
 from collections import namedtuple
-from combiner.util import db_connect
+from combiner.util import db_connect, Commit
 
 from combiner.settings import settings
 from glob import glob
@@ -86,12 +86,15 @@ def _store_on_db(iter_results, session):
 	#TODO: meter um with aqui pra fechar a conexao
 	for item in iter_results:
 		_send_to_db(session, item)
+	session.commit()
+	session.flush() # Make sure everything is stored
 
 def _send_to_db(session, item):
 	try:
-		session.add(item)
-		session.commit()
-		session.flush()
+		if item is Commit:
+			session.commit()
+		else:
+			session.add(item)
 	except:
 		session.rollback()
 		raise

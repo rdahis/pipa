@@ -39,3 +39,5 @@ def sanitize_item(item):
 		v = v.strip()
 		return v if v != '' else None
 	return { k:clean(v) for k,v in item.items()}
+
+class Commit(object): pass
