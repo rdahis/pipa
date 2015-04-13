@@ -8,6 +8,16 @@ apt::source { 'debian_backports':
 	repos             => 'main',
 }
 
+apt::source { 'firefox':
+	location          => 'http://packages.linuxmint.com',
+	release           => 'debian',
+	repos             => 'import',
+}->
+package {
+	"firefox":
+		ensure => latest,
+}
+
 class { 'postgresql::globals':
 	manage_package_repo => true,
 	version             => '9.4',

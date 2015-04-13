@@ -16,6 +16,8 @@ class Aluno(DeclarativeBase):
 	cor_raca = Column(String)
 	id_escola = Column(ForeignKey('escola.id_escola'))
 	escola = relationship('Escola')
+	id_municipio = Column(ForeignKey('municipio.id_municipio'))
+	municipio = relationship('Municipio')
 
 _Presenca = Enum('Faltou', 'Presente', 'Eliminado', name='presenca')
 class Aplicacao(DeclarativeBase):
@@ -42,6 +44,8 @@ class Aplicacao(DeclarativeBase):
 	redacao_comp4 = Column(String)
 	redacao_comp5 = Column(String)
 	nota_redacao = Column(String)
+	id_municipio = Column(ForeignKey('municipio.id_municipio'))
+	municipio = relationship('Municipio')
 
 class AlunoXNecessidadeEspecial(DeclarativeBase):
 	__tablename__ = "aluno_x_necessidade_especial"
@@ -66,6 +70,14 @@ class Escola(DeclarativeBase):
 	#tipo_instituicao = Column()
 	zona = Column(_ZonaEscola)
 	situacao = Column(_SituacaoEscola)
+	id_municipio = Column(ForeignKey('municipio.id_municipio'))
+	municipio = relationship('Municipio')
+
+class Municipio(DeclarativeBase):
+	__tablename__ = 'municipio'
+	id_municipio = Column(Integer, primary_key=True)
+	nome = Column(String)
+	uf = Column(String)
 
 raw_data = ['dados_enem_2012']
 def combine(data, db):
@@ -85,9 +97,10 @@ def combine(data, db):
 			estado_civil=item['TP_ESTADO_CIVIL'],
 			cor_raca=item['TP_COR_RACA'],
 			escola=escola,
+			municipio = __municipio(db, item, 'INSC'),
 		)
 		__add_necessidade_especial(item, aluno)
-		aplicacao = __aplicacao(item, aluno)
+		aplicacao = __aplicacao(db, item, aluno)
 		yield aplicacao
 
 def _get_escola(db, item):
@@ -99,6 +112,7 @@ def _get_escola(db, item):
 		zona=( {'1':'Urbana', '2':'Rural', '.':None}[item['ID_LOCALIZACAO']]),
 		situacao=( {'1':'Em Atividade', '2':'Paralisada', '3':'Extinta', '4':'Extinta em anos anteriores', '.':None}
 				[item['SIT_FUNC']]),
+		municipio = __municipio(db, item, 'ESC'),
 	)
 
 NECESSIDADES = {}
@@ -140,7 +154,7 @@ def _create_necessidade_especiais():
 	for k,v in NECESSIDADES_TRANSFORM.items():
 		NECESSIDADES[k] = NecessidadeEspecial(nome=v)
 
-def __aplicacao(item, aluno):
+def __aplicacao(db, item, aluno):
 	return Aplicacao(
 			presenca_cn=__presenca(item,'IN_PRESENCA_CN'),
 			presenca_ch=__presenca(item,'IN_PRESENCA_CH'),
@@ -163,14 +177,31 @@ def __aplicacao(item, aluno):
 			redacao_comp5=item['NU_NOTA_COMP5'],
 			nota_redacao=item['NU_NOTA_REDACAO'],
 			aluno=aluno,
+			municipio = __municipio(db, item, 'PROVA')
 	)
 
-def __presenca(item,sub):
+def __presenca(item, sub):
 	pres = int(item[sub])
 	if pres == 0: return 'Faltou'
 	if pres == 1: return 'Presente'
 	if pres == 2: return 'Eliminado'
 	raise Exception('invalid presenca %s' % pres)
+
+def __municipio(db, item, suffix):
+	id_municipio = item['COD_MUNICIPIO_' + suffix]
+	municipio = __municipio.cache.get(id_municipio)
+	if municipio: return municipio
+	nome = item['NO_MUNICIPIO_' + suffix]
+	if suffix == 'PROVA':
+		uf = item['UF_MUNICIPIO_PROVA']
+	else:
+		uf = item['UF_' + suffix]
+	municipio = get_or_create(db, Municipio, id_municipio=id_municipio, nome=nome, uf=uf)
+	__municipio.cache[id_municipio] = municipio
+	return municipio
+__municipio.cache = {}
+
+
 
 # IN_MESA_CADEIRA_RODAS': u'0', u'COD_MUNICIPIO_INSC': u'2933307', u'NU_NT_CN': u'.', u'COD_MUNICIPIO_PROVA': u'2933307', u'TX_RESPOSTAS_CN': u'', u'IN_AMPLIADA': u'0', u'IN_TRANSCRICAO': u'0', u'TP_COR_RACA': u'3', u'IN_PRESENCA_LC': u'0', u'IN_LEDOR': u'0', u'NU_NOTA_COMP4': u'.', u'ID_PROVA_CH': u'.', u'TX_RESPOSTAS_MT': u'', u'UF_INSC': u'BA', u'ID_PROVA_LC': u'.', u'IN_GESTANTE': u'0', u'IN_DEFICIENCIA_MENTAL': u'0', u'TP_ESCOLA': u'.', u'NU_NOTA_REDACAO': u'.', u'TP_LINGUA': u'.', u'IN_BRAILLE': u'0', u'NU_NT_LC': u'.', u'SIT_FUNC': u'.', u'TX_RESPOSTAS_CH': u'', u'DS_GABARITO_CH': u'', u'NO_ENTIDADE_CERTIFICACAO': u'', u'IN_PRESENCA_CH': u'0', u'IN_STATUS_REDACAO': u'F', u'NU_NT_MT': u'.', u'IN_ACESSO': u'0', u'IN_BAIXA_VISAO': u'0', u'IN_DEFICIENCIA_FISICA': u'0', u'IN_DISLEXIA': u'0', u'IN_LIBRAS': u'0', u'DS_GABARITO_MT': u'', u'ANO_CONCLUIU': u'2003', u'ST_CONCLUSAO': u'1', u'DS_GABARITO_CN': u'', u'NO_MUNICIPIO_INSC': u'VITORIA DA CONQUISTA', u'NU_INSCRICAO': u'400000000001', u'ID_DEPENDENCIA_ADM': u'.', u'IN_IDOSO': u'0', u'ID_LOCALIZACAO': u'.', u'UF_ENTIDADE_CERTIFICACAO': u'', u'IN_PRESENCA_CN': u'0', u'TX_RESPOSTAS_LC': u'', u'UF_ESC': u'', u'IN_LEITURA_LABIAL': u'0', u'NU_NOTA_COMP5': u'.', u'PK_COD_ENTIDADE': u'.', u'DS_GABARITO_LC': u'', u'NU_NOTA_COMP1': u'.', u'NO_MUNICIPIO_ESC': u'', u'NU_NOTA_COMP3': u'.', u'NU_NOTA_COMP2': u'.', u'IN_DEFICIT_ATENCAO': u'0', u'NO_MUNICIPIO_PROVA': u'VITORIA DA CONQUISTA', u'TP_ESTADO_CIVIL': u'1', u'IN_PRESENCA_MT': u'0', u'IN_APOIO_PERNA': u'0', u'ID_PROVA_CN': u'.', u'COD_MUNICIPIO_ESC': u'.', u'IN_LACTANTE': u'0', u'IN_SABATISTA': u'0', u'IN_GUIA_INTERPRETE': u'0', u'UF_MUNICIPIO_PROVA': u'BA', u'ID_PROVA_MT': u'.', u'IDADE': u'40', u'IN_DEFICIENCIA_AUDITIVA': u'0', u'IN_UNIDADE_HOSPITALAR': u'0', u'IN_AUTISMO': u'0', u'IN_SURDEZ': u'0', u'IN_TP_ENSINO': u'1', u'NU_ANO': u'2012', u'IN_CERTIFICADO': u'0', u'IN_MESA_CADEIRA_SEPARADA': u'0', u'TP_SEXO': u'0', u'IN_SURDO_CEGUEIRA': u'0', u'NU_NT_CH': u'.', u'IN_CEGUEIRA': u'0'}
 
