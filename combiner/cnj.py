@@ -103,22 +103,3 @@ def combine(data, db):
 		)
 
 
-	for item in data:
-		item = sanitize_item(item)
-		translated_item = transform_dict(item, raw2orm_translation) 
-		deputado = CamaraFederalDeputado(**translated_item)
-		yield deputado
-		partido = db.query(CamaraFederalPartido).filter_by(e_id_partido=item['idPartido']).all()
-		if partido:
-			assert len(partido) == 1
-			partido = partido[0]
-			deputado_partido = CamaraFederalDeputadoPartido(
-				id_deputado=deputado.id_deputado,
-				id_partido=partido.id_partido,
-				data_ingresso=datetime.date.today()
-			)
-			yield deputado_partido
-
-
-
-
