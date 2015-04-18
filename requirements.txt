@@ -15,3 +15,7 @@ selenium
 unicodecsv
 argcomplete
 argparse
+
+# sanitizers
+PyPDF2
+pdfminer
