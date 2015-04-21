@@ -19,3 +19,4 @@ argparse
 # sanitizers
 PyPDF2
 pdfminer
+pdfquery
