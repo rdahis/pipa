@@ -90,4 +90,5 @@ Vagrant.configure(2) do |config|
   end
 
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'" # Fix annoying warning
+  config.ssh.forward_x11 = true
 end

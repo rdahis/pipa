@@ -4,20 +4,25 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 import sys, os
 
+download_path = "/DP/tmp/ffdownloads"
+
 def setup_firefox():
-	driver = webdriver.Firefox()
-	driver.implicitly_wait(0.2)
+	profile = webdriver.FirefoxProfile()
 	handlers =  "application/pdf"
-	path = "tmp/"
-	driver.firefox_profile.set_preference("browser.download.folderList",1)
-	driver.firefox_profile.set_preference("browser.download.manager.showWhenStarting",False)
-	driver.firefox_profile.set_preference("browser.download.dir", path)
-	driver.firefox_profile.set_preference("browser.download.downloadDir", path)
-	driver.firefox_profile.set_preference("browser.download.defaultFolder", path)
-	driver.firefox_profile.set_preference("browser.helperApps.alwaysAsk.force", False)
-	driver.firefox_profile.set_preference("browser.helperApps.neverAsk.saveToDisk", handlers)
-	driver.firefox_profile.set_preference("pdfjs.disabled", True)
-	driver.firefox_profile.update_preferences()
+	if not os.path.exists(download_path):
+		os.makedirs(download_path)
+	profile.set_preference("browser.download.folderList", 2)
+	profile.set_preference("browser.download.manager.showWhenStarting",False)
+	profile.set_preference("browser.download.dir", download_path)
+	profile.set_preference("browser.download.downloadDir", download_path)
+	profile.set_preference("browser.download.defaultFolder", download_path)
+	profile.set_preference("browser.helperApps.alwaysAsk.force", False)
+	profile.set_preference("browser.helperApps.neverAsk.saveToDisk", handlers)
+	profile.set_preference("pdfjs.disabled", True)
+	profile.update_preferences()
+	driver = webdriver.Firefox(profile)
+	driver.implicitly_wait(2)
+	driver.set_window_size(1200, 800)
 	return driver
 
 driver = setup_firefox()
@@ -27,7 +32,7 @@ def main():
 	driver.get(url)
 	assert driver.current_url == url
 	menu = driver.find_element_by_xpath("//div[@class='menu navbar']")
-	menu.find_element_by_tag_name('button').click()
+	# menu.find_element_by_tag_name('button').click()
 	links = menu.find_elements_by_tag_name('a')
 	menu.find_element_by_partial_link_text('1º Grau').click()
 	menu.find_element_by_partial_link_text('Produtividades - Consultar por Serventia').click()
@@ -36,8 +41,7 @@ def main():
 	ufs = driver.find_elements_by_tag_name('area')
 	ufs = [ (tag.get_attribute('title'), tag) for tag in ufs]
 
-
-	#for
+	# for
 	crawl_state(ufs[0][1])
 
 	try: os.unlink('tmp/a.png')
@@ -70,18 +74,22 @@ def crawl_relatorio(relatorio):
 	relatorio.click()
 	table_serventia = driver.find_element_by_xpath("//strong[contains(text(), 'Produtividades da serventia')]/../..")
 	serventias = table_serventia.find_elements_by_xpath("//a/center/img/../..")
-	#for serventias
-	download_serventia(serventias[0])
+	for serventia in serventias:
+		download_serventia(serventia)
 
 def download_serventia(serventia): # arg: 'a' tag
+	import glob, time
+	num_files = len(glob.glob('tmp/ffdownloads/out*'))
+	print('trying' + str(serventia))
+	print(num_files)
 	serventia.click()
 	assert(len(driver.window_handles) == 2)
-	driver.switch_to_window(driver.window_handles[1])
-	save = driver.find_element_by_id('viewer').get_attribute('innerHTML')
-	with open('tmp/name.html', 'w') as f:
-		f.write(save)
-	import ipdb;ipdb.set_trace()
-	driver.switch_to_window(driver.window_handles[0])
+	for i in range(0,100):
+		print('sleep')
+		time.sleep(0.1)
+		if num_files + 1 == len(glob.glob('tmp/ffdownloads/out*')):
+			break
+	else: raise Exception()
 
 def execute_search():
 	driver.find_element_by_xpath("//button[text()='Pesquisar']").click()
