@@ -2,9 +2,14 @@
 #encoding: utf8
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from logging import getLogger, StreamHandler
 import sys, os
 
 download_path = "/DP/tmp/ffdownloads"
+logging = getLogger(__name__)
+logging.setLevel('DEBUG')
+logging.addHandler(StreamHandler())
+logging.info('Start application')
 
 def setup_firefox():
 	profile = webdriver.FirefoxProfile()
@@ -79,17 +84,24 @@ def crawl_relatorio(relatorio):
 
 def download_serventia(serventia): # arg: 'a' tag
 	import glob, time
-	num_files = len(glob.glob('tmp/ffdownloads/out*'))
-	print('trying' + str(serventia))
-	print(num_files)
+	dest_file = download_path + '/' + serventia.get_attribute('onclick')
+	if os.path.isfile(dest_file + '.pdf'):
+		logging.info('file already downloaded')
+		return False
+	assert not os.path.isfile('tmp/ffdownloads/out.php') == [] , 'there is a out.php left here, aborting' + str(glob.glob('tmp/ffdownloads/out*'))
+	logging.info('starting download ' + dest_file)
 	serventia.click()
 	assert(len(driver.window_handles) == 2)
-	for i in range(0,100):
-		print('sleep')
+	for i in range(0, 100):
 		time.sleep(0.1)
-		if num_files + 1 == len(glob.glob('tmp/ffdownloads/out*')):
+		if os.path.isfile('tmp/ffdownloads/out.php') and os.path.getsize('tmp/ffdownloads/out.php'):
 			break
 	else: raise Exception()
+	os.rename(download_path + '/out.php', dest_file + '.pdf')
+	logging.info('downloaded file ' + dest_file)
+	assert len(glob.glob('tmp/ffdownloads/out*.php')) == 0
+	return True
+
 
 def execute_search():
 	driver.find_element_by_xpath("//button[text()='Pesquisar']").click()
