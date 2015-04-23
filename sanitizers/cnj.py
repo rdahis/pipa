@@ -50,7 +50,6 @@ class Parser():
 		self.out = {}
 		self.out_keys = []
 
-
 	def _initial(self, line):
 		if ':' in line:
 			self.state = self._header
@@ -90,8 +89,6 @@ class Parser():
 		min_x0 = min(self._get_x0_coord_for_num_els(text_els))
 		text_els_filtered = [el for el in text_els if not el.text.strip().isdigit() or float(el.attrib['x0']) > min_x0 + 10 ] # Eliminamos caras a dez pixels do mais da direita pois os numeros de 2 digitos estao em coordenadas perto, mas diferetnes
 		text = [el.text for el in text_els_filtered] # for debuging help
-		#assert max(['DESPACHOS PROFERIDOS EM PLANT' in string for string in text])
-		import ipdb; ipdb.set_trace()
 		for el in text_els_filtered:
 			line = el.text.strip()
 			if line and self.state:
@@ -103,7 +100,6 @@ class Parser():
 
 	def _get_x0_coord_for_num_els(self, text_els):
 		ret = [float(el.attrib['x0']) for el in text_els if el.text.strip().isdigit()]
-		import ipdb; ipdb.set_trace()
 		return ret
 
 def isfloat(value):
