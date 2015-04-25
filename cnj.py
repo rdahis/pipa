@@ -13,17 +13,23 @@ logging.info('Start application')
 
 def setup_firefox():
 	profile = webdriver.FirefoxProfile()
+	del profile.DEFAULT_PREFERENCES['frozen']["browser.link.open_newwindow"] # let me live my life, the way i want to
 	handlers =  "application/pdf"
 	if not os.path.exists(download_path):
 		os.makedirs(download_path)
-	profile.set_preference("browser.download.folderList", 2)
-	profile.set_preference("browser.download.manager.showWhenStarting",False)
-	profile.set_preference("browser.download.dir", download_path)
-	profile.set_preference("browser.download.downloadDir", download_path)
-	profile.set_preference("browser.download.defaultFolder", download_path)
-	profile.set_preference("browser.helperApps.alwaysAsk.force", False)
-	profile.set_preference("browser.helperApps.neverAsk.saveToDisk", handlers)
-	profile.set_preference("pdfjs.disabled", True)
+	for pref, v in {
+			"browser.download.folderList": 2,
+			"browser.download.manager.showWhenStarting":False,
+			"browser.download.dir": download_path,
+			"browser.download.downloadDir": download_path,
+			"browser.download.defaultFolder": download_path,
+			"browser.helperApps.alwaysAsk.force": False,
+			"browser.helperApps.neverAsk.saveToDisk": handlers,
+			"browser.tabs.loadDivertedInBackground": True,
+			"browser.link.open_newwindow": 3,
+			"pdfjs.disabled": True,
+			}.items():
+		profile.set_preference(pref, v)
 	profile.update_preferences()
 	driver = webdriver.Firefox(profile)
 	driver.implicitly_wait(2)
@@ -46,41 +52,68 @@ def main():
 	ufs = driver.find_elements_by_tag_name('area')
 	ufs = [ (tag.get_attribute('title'), tag) for tag in ufs]
 
-	# for
-	crawl_state(ufs[0][1])
+	for uf_name, uf_tag in ufs[0:1]:
+		logging.info('Crawling state:' + uf_name)
+		crawl_state(uf_tag.get_attribute('onclick'))
 
 	try: os.unlink('tmp/a.png')
 	except OSError: pass
 
-	driver.save_screenshot('tmp/a.png')
-	import ipdb;ipdb.set_trace()
+class RefreshingWebElement():
+	def __init__(self, f):
+		self.f = f
+		self.idx = 0
+		self.len = len(self.f())
+	def __iter__(self): return self
+	def __len__(self): return self.len
+	def next(self):
+		if self.idx < len(self):
+			ret = self.f()[self.idx]
+			self.idx += 1
+			return ret
+		else: raise StopIteration
 
-
-def crawl_state(tag):
-	driver.execute_script(tag.get_attribute('onclick'))
-	municipios = driver.find_element_by_id('cidade_serventia').find_elements_by_tag_name('option')
-	anos = driver.find_element_by_id('anos').find_elements_by_tag_name('option')
-	municipios, anos = municipios[1:], anos[1:] # remove the first option (useless)
-	#for federal, municipio, ano
-	municipio, ano = municipios[1], anos[0]
-	crawl_municipio_ano(municipio, ano)
+def crawl_state(tag_script):
+	driver.execute_script(tag_script)
+	municipios = lambda: driver.find_element_by_id('cidade_serventia').find_elements_by_tag_name('option')[1:]
+	anos = lambda: driver.find_element_by_id('anos').find_elements_by_tag_name('option')[1:]
+	for municipio_idx in range(0, len(municipios())):
+		for ano in RefreshingWebElement(anos):
+			municipio = municipios()[municipio_idx]
+			crawl_municipio_ano(municipio, ano)
+			driver.execute_script(tag_script)
 
 def crawl_municipio_ano(m, a):
+	logging.info('crawling municipio %s on ano %s' % (m.text, a.text))
 	m.click()
 	a.click()
 	execute_search()
-	table_prod = driver.find_element_by_id('consulta')
+	# precisa ser lambda pra re-encontrar os elementos depois do driver.back()
+	table_prod = lambda: driver.find_element_by_id('consulta')
+
 	# xpath do capeta q pega os 'a' que tem um filho img do tipo Produtividades
-	relatorios = table_prod.find_elements_by_xpath("//a/img[@title='Produtividades']/parent::*")
-	# for relatorios
-	crawl_relatorio(relatorios[0])
+	relatorios = lambda: table_prod().find_elements_by_xpath("//a/img[@title='Produtividades']/..")
+	for relatorio in RefreshingWebElement(relatorios):
+		crawl_relatorio(relatorio)
+	driver.back()
 
 def crawl_relatorio(relatorio):
 	relatorio.click()
-	table_serventia = driver.find_element_by_xpath("//strong[contains(text(), 'Produtividades da serventia')]/../..")
-	serventias = table_serventia.find_elements_by_xpath("//a/center/img/../..")
-	for serventia in serventias:
-		download_serventia(serventia)
+	try:
+		table_serventia = driver.find_element_by_xpath("//strong[contains(text(), 'Produtividades da serventia')]/../..")
+		if u'Não existe' in table_serventia.text:
+			logging.info('Empty table')
+			return
+		prox_pagina = table_serventia.find_element_by_id('display_next')
+		while True:
+			serventias = table_serventia.find_elements_by_xpath("//a/center/img/../..")
+			for serventia in serventias:
+				download_serventia(serventia)
+			if 'disabled' in prox_pagina.get_attribute('class'):
+				break
+			prox_pagina.click()
+	finally:
+		driver.back()
 
 def download_serventia(serventia): # arg: 'a' tag
 	import glob, time
@@ -91,7 +124,6 @@ def download_serventia(serventia): # arg: 'a' tag
 	assert not os.path.isfile('tmp/ffdownloads/out.php') == [] , 'there is a out.php left here, aborting' + str(glob.glob('tmp/ffdownloads/out*'))
 	logging.info('starting download ' + dest_file)
 	serventia.click()
-	assert(len(driver.window_handles) == 2)
 	for i in range(0, 100):
 		time.sleep(0.1)
 		if os.path.isfile('tmp/ffdownloads/out.php') and os.path.getsize('tmp/ffdownloads/out.php'):
@@ -110,8 +142,10 @@ def ss():
 	driver.save_screenshot('tmp/error.png')
 
 if __name__ == '__main__':
-	try:
-		main()
-	except Exception:
-		ss()
-		raise
+	from ipdb import launch_ipdb_on_exception
+	with launch_ipdb_on_exception():
+		try:
+			main()
+		except Exception as ee:
+			ss()
+			raise
