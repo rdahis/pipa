@@ -2,14 +2,26 @@
 #encoding: utf8
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from logging import getLogger, StreamHandler
 import sys, os
+import shelve
+from cnj_helpers import DownloadController
+import inspect
+
+def lineno():
+	"""Returns the current line number in our program."""
+	return inspect.currentframe().f_back.f_lineno
+
+
+class TimeOutException(Exception): pass
 
 download_path = "/DP/tmp/ffdownloads"
 logging = getLogger(__name__)
 logging.setLevel('DEBUG')
 logging.addHandler(StreamHandler())
 logging.info('Start application')
+download_controller = DownloadController('/DP/tmp/ffdownloads/control.dbm', logger=logging)
 
 def setup_firefox():
 	profile = webdriver.FirefoxProfile()
@@ -49,15 +61,19 @@ def main():
 	menu.find_element_by_partial_link_text('Produtividades - Consultar por Serventia').click()
 
 	mapinha = driver.find_element_by_tag_name('map')
-	ufs = driver.find_elements_by_tag_name('area')
-	ufs = [ (tag.get_attribute('title'), tag) for tag in ufs]
+	def ufs():
+		ufs = driver.find_elements_by_tag_name('area')
+		ufs = [ (tag.get_attribute('title'), tag) for tag in ufs]
+		return ufs
 
-	for uf_name, uf_tag in ufs[0:1]:
+	for uf in RefreshingWebElement(ufs)[0:1]:
+		uf_name, uf_tag = uf()
 		logging.info('Crawling state:' + uf_name)
-		crawl_state(uf_tag.get_attribute('onclick'))
+		crawl_state(uf_tag.get_attribute('onclick'), control_key=uf_name)
 
 	try: os.unlink('tmp/a.png')
 	except OSError: pass
+
 
 class RefreshingWebElement():
 	def __init__(self, f):
@@ -73,17 +89,33 @@ class RefreshingWebElement():
 			return ret
 		else: raise StopIteration
 
-def crawl_state(tag_script):
-	driver.execute_script(tag_script)
-	municipios = lambda: driver.find_element_by_id('cidade_serventia').find_elements_by_tag_name('option')[1:]
-	anos = lambda: driver.find_element_by_id('anos').find_elements_by_tag_name('option')[1:]
-	for municipio_idx in range(0, len(municipios())):
-		for ano in RefreshingWebElement(anos):
-			municipio = municipios()[municipio_idx]
-			crawl_municipio_ano(municipio, ano)
-			driver.execute_script(tag_script)
+def RefreshingWebElement(fun):
+	els = fun()
+	return map(lambda x: lambda: fun()[els.index(x)], els)
 
-def crawl_municipio_ano(m, a):
+@download_controller.apply_control
+def crawl_state(tag_script):
+	success = True
+	driver.execute_script(tag_script)
+	# Podemos otimizar essa merda aqui loopando pelos nomes dos municipios e usando isso para encontra-los la dentro, salvaria o find para o cache
+	municipios = lambda: driver.find_elements_by_xpath('//*[@id="cidade_serventia"]/option')[1:]
+	anos = lambda: driver.find_elements_by_xpath('//*[@id="anos"]/option')[1:]
+	anos_text = [a.text for a in anos()]
+	for municipio, municipio_text in zip(RefreshingWebElement(municipios), [m.text for m in municipios()]):
+		for ano, ano_text in zip(RefreshingWebElement(anos), anos_text):
+			try:
+				control_key = municipio_text + '-' + ano_text
+				ret = crawl_municipio_ano(municipio, ano, control_key=control_key)
+				if ret is not download_controller.SKIPPED:
+					driver.execute_script(tag_script) # refresh
+			except TimeOutException:
+				success = False
+	return success
+
+@download_controller.apply_control
+def crawl_municipio_ano(m, a, control_key=None):
+	m, a = m(), a()
+	assert m.text + '-' + a.text == control_key
 	logging.info('crawling municipio %s on ano %s' % (m.text, a.text))
 	m.click()
 	a.click()
@@ -96,9 +128,10 @@ def crawl_municipio_ano(m, a):
 	for relatorio in RefreshingWebElement(relatorios):
 		crawl_relatorio(relatorio)
 	driver.back()
+	return True
 
 def crawl_relatorio(relatorio):
-	relatorio.click()
+	relatorio().click()
 	try:
 		table_serventia = driver.find_element_by_xpath("//strong[contains(text(), 'Produtividades da serventia')]/../..")
 		if u'Não existe' in table_serventia.text:
@@ -128,7 +161,8 @@ def download_serventia(serventia): # arg: 'a' tag
 		time.sleep(0.1)
 		if os.path.isfile('tmp/ffdownloads/out.php') and os.path.getsize('tmp/ffdownloads/out.php'):
 			break
-	else: raise Exception()
+	else:
+		raise TimeOutException()
 	os.rename(download_path + '/out.php', dest_file + '.pdf')
 	logging.info('downloaded file ' + dest_file)
 	assert len(glob.glob('tmp/ffdownloads/out*.php')) == 0
@@ -141,9 +175,9 @@ def execute_search():
 def ss():
 	driver.save_screenshot('tmp/error.png')
 
+from ipdb import launch_ipdb_on_exception
 if __name__ == '__main__':
-	from ipdb import launch_ipdb_on_exception
-	with launch_ipdb_on_exception():
+	#with launch_ipdb_on_exception():
 		try:
 			main()
 		except Exception as ee:
